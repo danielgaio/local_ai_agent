@@ -2,3 +2,4 @@ pandas
 langchain
 langchain-ollama
 langchain-chroma
+pytest
