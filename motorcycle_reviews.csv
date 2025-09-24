@@ -1,0 +1,179 @@
+brand,model,year,engine_cc,price_usd_estimate,ride_type,stars,pros,cons,comment,reviewer,review_date,fuel_km_per_l,weight_kg
+Honda,CB500X,2023,471,6999,Adventure,4.5,"Reliable, comfortable upright riding position, good fuel economy","Limited top speed for highway touring, average wind protection","A very solid all-rounder for new and experienced riders who want light adventure capability without breaking the bank.",Alex J,2024-08-12,24.7,195.0
+Yamaha,MT-07,2024,689,7599,Naked,4.7,"Playful torque-rich engine, lightweight chassis, great value","Minimal touring comfort, basic electronics compared to competitors","Impossibly fun in twisties and easy to ride every day — the MT-07 remains a top pick for riders wanting excitement on a budget.",Sam R,2025-03-02,21.0,182.8
+Kawasaki,Z900RS,2022,948,11499,Retro/Naked,4.6,"Classic styling with modern performance, comfortable ergonomics","Heavier than some peers, pricier maintenance parts","A beautiful blend of old-school looks and modern performance; great for relaxed long weekend rides.",Priya K,2023-11-16,18.9,211.6
+BMW,R1250GS,2023,1254,17995,Adventure-Touring,4.8,"Outstanding long-distance comfort, advanced electronics, powerful boxer torque","High purchase price, heavy at low speeds","The gold standard for long-distance adventure touring — confidence-inspiring but costly to buy and maintain.",Marco L,2024-05-20,22.6,259.8
+Ducati,Panigale V2,2024,955,14995,Sport,4.4,"Sharp handling, impressive brakes, premium fit and finish","Aggressive ergonomics not ideal for long rides, higher running costs","A grin-inducing track-capable sportbike that also surprisingly handles well on the road when ridden carefully.",Emily W,2024-09-01,13.1,179.2
+Triumph,Bonneville T120,2021,1200,12500,Classic,4.3,"Iconic styling, refined twin, comfortable for relaxed cruising","Not focused on high performance, heavier than smaller classics","Perfect for riders seeking style and a relaxed riding experience rather than outright speed.",Jared P,2022-06-10,23.4,220.5
+Suzuki,GSX-S750,2023,749,8599,Street/Naked,4.2,"Strong midrange, good value, lightweight feel","Less advanced electronics than rivals, firm suspension for some riders","A great all-around streetfighter that balances performance and practicality at a fair price.",Nina T,2024-02-18,18.7,203.7
+Harley-Davidson,Iron 883,2022,883,9999,Cruiser,3.9,"Authentic cruiser feel, low seat height, easy to customize","Vibrations at highway speeds, outdated tech compared to modern bikes","A timeless-looking cruiser for those who value style and personality over outright performance.",Omar H,2023-07-04,17.0,255.7
+KTM,390 Duke,2024,373,5499,Street/Naked,4.1,"Extremely light, sharp handling, modern TFT dash","Smaller engine not ideal for long highway runs, firm ride","An exceptionally fun city bike that punches above its weight and is perfect for new riders wanting high spec.",Leah M,2025-01-11,29.7,169.3
+MV Agusta,Brutale 800,2023,798,16995,Naked/Sport,4.0,"Exquisite design, aggressive performance, premium components","High price for displacement, less comfortable as a daily commuter","A head-turning machine with a soundtrack and presence to match — best as a weekend/enthusiast bike.",Carlos V,2024-10-05,14.9,190.5
+Aprilia,RS 660,2022,659,11500,Sport,4.5,"Great balance of performance and usability, modern electronics","Still a mid-displacement bike; not full superbike power","A superb middleweight sportbike that covers sport and weekend touring duties well.",Marta S,2023-03-22,16.5,183.0
+Indian,Scout Sixty,2021,999,9239,Cruiser,4.0,"Classic cruiser vibe, comfortable ergonomics","Lower power than big V-twins, basic electronics","Solid cruiser for riders who want classic styling at a lower price point.",Derek F,2022-11-08,15.2,231.0
+Royal Enfield,CONCEPT,2024,650,6799,Classic,3.8,"Strong retro appeal, affordable","Build quality sometimes inconsistent, average performance","Good value for classic styling, but expect compromises in fit/finish.",Anita V,2024-06-15,22.0,198.0
+Husqvarna,Vitpilen 401,2023,373,5399,Naked,4.1,"Minimalist design, light and nimble","Short windscreen, limited long-distance comfort","An urban-focused machine that looks great and is fun around town.",Ibrahim K,2023-09-30,28.0,160.0
+Bajaj,Pulsar NS200,2022,199,1999,Street/Naked,3.7,"Affordable, peppy small-displacement engine","Basic fit/finish compared to premium brands","An excellent budget option in emerging markets.",Rina S,2022-12-12,27.5,144.0
+Hero,XPulse 200,2023,199,2399,Adventure,3.9,"Lightweight, great for rough roads, cheap to run","Less power on highway, basic components","A competent low-cost adventure bike for rough roads and trails.",Manoj P,2023-08-05,30.2,148.5
+CFMoto,MT650,2024,650,5799,Naked,4.0,"Strong value proposition, decent performance","Brand recognition still growing, dealer support varies","Great entry-level midweight for riders who want a value-packed machine.",Olga R,2024-02-14,19.5,201.0
+Benelli,TRK502,2021,500,6499,Adventure,3.8,"Comfortable touring posture, good luggage options","Heavier than comparable twins, build quality variable","A touring-focused machine with solid comfort for long rides on a budget.",Hugo G,2022-04-07,22.8,231.5
+Norton,Commando 961,2023,961,17999,Classic,4.2,"Handbuilt feel, unique character","Extremely expensive, limited dealer network","A boutique classic with charm—best for collectors and enthusiasts.",Claire B,2024-01-19,15.8,205.0
+Bimota,KB4,2022,1000,24990,Sport,4.1,"Exotic design, premium components","Very high price, niche appeal","A beautiful, limited-run sportbike for collectors.",Luca P,2023-05-25,12.3,196.0
+Moto Guzzi,V7 Stone,2021,744,7990,Classic,4.0,"Unique transverse V-twin character, comfortable cruiser ergonomics","Not the quickest, dated tech","Great for relaxed cruising with Italian character.",Sofia M,2022-09-10,20.1,210.0
+GasGas,EC 300,2024,300,8999,Enduro,4.4,"Lightweight, great off-road capability","Track-focused, not street-friendly without modifications","Excellent off-road-focused machine for trials and enduro.",Pablo D,2024-04-02,16.7,110.0
+Sherco,SEF-R,2022,300,8995,Enduro,4.3,"Top-tier off-road performance, light","Purpose-built off-road—sparse on-road amenities","A hard-core off-road bike for competition riders.",Maya L,2023-10-01,14.2,108.0
+Zero,SR/F,2023,0,19995,Electric,4.2,"Instant torque, low running cost, modern dash","Range anxiety, charging infrastructure dependent","A compelling electric roadster for city and short-range touring.",Evan H,2024-07-11,0.0,220.0
+Energica,EsseEsse9,2022,0,21900,Electric,4.3,"High-performance electric superbike, rapid charge capability","Very high price, niche market","One of the few electric bikes that truly competes with ICE superbikes in straight-line performance.",Giorgia N,2023-06-28,0.0,245.0
+Triumph,Street Triple RS,2024,765,10999,Naked,4.6,"Stellar handling, high-revving triple, premium brakes","Firm seat for long rides","A favorite among riders who want a performance-focused street naked.",Damien C,2024-11-04,18.2,166.0
+Honda,CBR650R,2023,649,9499,Sport,4.1,"Smooth inline-four, strong midrange","Sport ergonomics not best for long touring","A sporty middleweight that fits both occasional track days and spirited street riding.",Yuki T,2023-12-21,16.8,211.0
+Yamaha,Tenere 700,2022,689,9999,Adventure,4.5,"Lightweight adventure chassis, reliable parallel twin","Limited highway comfort with luggage","A no-nonsense capable adventure bike that's loved by many for its simplicity and off-road prowess.",Carlos M,2023-04-18,20.5,197.5
+Kawasaki,Versys 1000,2021,1043,12999,Touring,4.3,"Comfortable touring ergonomics, long-range capability","Not as sporty as some rivals","Dependable long-distance tourer with good equipment.",Helena F,2022-02-27,19.0,245.0
+BMW,S1000XR,2023,999,16995,Adventure-Touring,4.5,"Sporty performance, advanced electronics","Pricey options, heavier than pure sportbikes","A performance-oriented sport-touring machine with excellent technology.",Igor S,2024-03-16,12.8,244.0
+Ducati,Multistrada V2,2024,937,14995,Adventure-Touring,4.4,"Versatile, sporty handling for an ADV, great electronics","Expensive servicing, premium price","A fun, sporty adventure bike that also handles long-distance comfort well.",Lena R,2024-08-09,17.6,220.0
+Suzuki,V-Strom 650,2023,645,8299,Adventure,4.0,"Reliable, comfortable, great value","Less power than larger ADVs, basic electronics","A practical middleweight adventure bike that does nearly everything well.",Taro N,2024-05-05,22.0,213.0
+Harley-Davidson,Street Bob 114,2022,1868,13999,Cruiser,4.1,"Iconic V-twin rumble, low-slung style","Heavy in traffic, thirsty engine","An authentic big cruiser experience tailored to those who want a classic Harley feel.",Mason G,2023-01-30,11.6,320.0
+KTM,1290 Super Duke R,2023,1301,17999,Naked/Sport,4.7,"Insane torque, sharp handling, high-end components","Aggressive ergonomics, costly to maintain","A powerful and focused sport naked for experienced riders.",Ines P,2024-06-12,11.2,192.0
+Aprilia,Tuono V4,2023,1077,15999,Naked/Sport,4.6,"V4 soundtrack, blistering performance, advanced electronics","High price, aggressive seating position","One of the most exciting street-naked bikes you can ride.",Marco G,2024-01-08,12.6,182.0
+Indian,Chieftain,2021,1811,21999,Touring,4.2,"Luxurious touring features, big displacement cruiser comfort","Bulky to maneuver in tight spaces","A luxury cruiser-tourer for long highway miles in comfort.",Samantha Y,2022-07-19,9.8,360.0
+Royal Enfield,Himalayan,2024,411,4999,Adventure,3.9,"Low-cost adventure platform, easy to maintain","Underpowered on highway, basic components","A no-frills practical adventure bike for entry-level touring.",Karan S,2024-03-03,26.2,184.0
+Husqvarna,TE 300i,2023,300,9299,Enduro,4.5,"Two-stroke power with modern fuel injection, very light","Not ideal for street use without modifications","A favorite for off-road racers and enthusiasts who want light power.",Zoe Q,2023-11-02,15.5,112.0
+Bajaj,Dominar 400,2022,373,1999,Touring,3.9,"Affordable big-feel cruiser for the price","Not as refined as premium brands","Great value touring commuter in price-sensitive markets.",Rohit M,2022-05-21,25.0,176.0
+Hero,Hunk 160R,2021,160,1299,Street,3.6,"Cheap and simple to maintain","Basic components, modest power","Good low-cost commuter with conservative ergonomics.",Priya A,2021-08-14,28.3,150.0
+CFMoto,700CL-X,2024,693,6999,Neo-Retro,4.0,"Stylish neo-retro design, capable twin","Some cheap-feeling plastics","A stylish affordable retro with modern features.",Nicolas B,2024-09-07,18.9,181.0
+Benelli,Leoncino 500,2023,499,6495,Classic,3.9,"Attractive looks, pleasant twin engine","Brand perception and dealer support vary by region","A charming mid-displacement classic with Italian styling.",Alessia R,2023-02-02,21.3,195.0
+Norton,Atlas 650,2022,650,12499,Adventure,3.8,"Heritage styling, competent chassis","High price for displacement, niche brand","A boutique adventure cruiser with classic British styling.",Daniel K,2022-10-10,20.2,200.0
+Bimota,DB11,2023,1100,21999,Sport,4.0,"Exotic handling, boutique build","Very high cost, limited practicality","An exclusive track-oriented machine for a niche audience.",Francesca T,2024-02-28,12.1,198.0
+Moto Guzzi,V85 TT,2023,853,9995,Adventure,4.2,"Characterful engine, comfortable ergonomics","Not as fast as inline-four ADVs, retro tech","Great for riders who want character and comfortable long-distance capability.",Rafael O,2023-07-21,19.4,225.0
+GasGas,TR 450,2023,450,9999,Trail,4.3,"Excellent off-road geometry, light","Specialized trail focus","A focused trail bike built for agile off-road riding.",Isabel C,2023-05-09,14.6,115.0
+Sherco,SM 125,2022,125,6999,Supermoto,4.0,"Light and nimble around town, fun","Limited top speed for highway cruising","A playful supermoto for riders who favor handling over straight-line speed.",Oliver N,2022-11-11,30.5,120.0
+Zero,FX,2024,0,8695,Electric,4.0,"Great for city commutes, low running cost","Limited highway range","Light, nimble electric commuter with fun acceleration.",Janelle T,2024-12-01,0.0,125.0
+Energica,Urbania,2023,0,13900,Electric,4.1,"Comfortable urban electric with premium finish","Price still high for wide adoption","A quiet, fast, and modern urban electric motorcycle.",Felipe R,2023-09-14,0.0,235.0
+Triumph,Tiger 900,2022,888,11999,Adventure,4.4,"Excellent on- and off-road balance, refined engine","Some vibration at high revs","A versatile adventure bike suited for mixed riding.",Hannah L,2023-03-08,18.8,206.0
+Honda,CB300R,2023,286,4499,Naked,4.0,"Light, easy for new riders, modern styling","Limited power for two-up or highway overtakes","A great entry-level option with premium feel relative to displacement.",Ken W,2023-06-06,26.5,143.0
+Yamaha,YZF-R3,2022,321,5299,Sport,4.0,"Accessible sport ergonomics, reliable engine","Small for taller riders on long rides","A solid lightweight sportbike for new and returning riders.",Maya P,2022-04-22,25.8,166.0
+Kawasaki,KLX230,2024,233,4599,Dual-Sport,3.9,"Lightweight dual-sport, easy handling","Not fast on highway, basic features","A great lightweight dual-sport for trail and light commute.",Owen L,2024-05-16,32.0,137.0
+BMW,F850GS,2023,853,13995,Adventure,4.4,"Good balance of power and agility, advanced tech","Pricey options can push cost up","A refined mid-displacement adventure for serious touring.",Greta H,2024-02-02,20.0,225.0
+Ducati,Monster Plus,2021,937,9995,Naked,4.1,"Distinctive Ducati character, great chassis","Less practical for long-distance touring","A charismatic naked that rewards sporty riding.",Alvaro N,2022-01-15,17.9,182.0
+Suzuki,Hayabusa,2023,1340,18999,Sport,4.6,"Legendary top-speed capability, stable at speed","Huge power requires respect, heavy for city use","A bulletproof performance machine for high-speed touring.",Beatrice S,2024-06-22,11.5,266.0
+Harley-Davidson,Low Rider S,2021,1868,14999,Cruiser,4.0,"Powerful torque, classic looks","Weight and fuel consumption","A muscular cruiser with classic American V-twin feel.",Quinn R,2021-09-09,10.8,330.0
+KTM,690 Enduro R,2022,693,9999,Adventure,4.3,"Fantastic off-road capability with street-legal convenience","Firm suspension for street comfort","An all-rounder loved by dual-sport enthusiasts.",Mateo V,2023-10-10,20.6,149.0
+Aprilia,RSV4,2023,1100,19999,Sport,4.7,"World-class performance, brilliant chassis","Expensive to buy and run","A top-tier superbike with racing DNA.",Sasha I,2024-04-26,12.4,198.0
+Indian,Chief Dark Horse,2022,1811,17999,Cruiser,4.2,"Bold styling, confident highway cruiser","Heavy and large footprint","A strong-looking cruiser with modern amenities.",Tom H,2023-02-20,9.6,355.0
+Royal Enfield,Interceptor 650,2023,648,5999,Classic,4.1,"Balanced twin engine, affordable classic styling","Not the fastest, basic electronics","A great retro package for everyday riding.",Zara F,2023-07-07,23.0,202.0
+Husqvarna,701 Enduro,2024,692,9999,Adventure,4.4,"Light and powerful single, great off-road handling","Short on touring amenities","A focused, agile single-cylinder adventure machine.",Rico M,2024-09-19,19.8,142.0
+Bajaj,Avenger 220,2021,220,1699,Cruiser,3.5,"Low-cost cruiser look, comfortable ergonomics","Not performance-oriented","A budget cruiser suitable for city cruising.",Suresh B,2021-11-02,24.6,167.0
+Hero,Xpulse 200T,2022,199,2599,Adventure,3.8,"Affordable commuting and light touring","Lower touring comfort at speed","A practical and inexpensive adventure-capable commuter.",Meera D,2022-08-19,29.0,150.0
+CFMoto,250 NK,2023,249,3199,Street,3.9,"Affordable modern styling, light","Less powerful than larger street bikes","An accessible modern street bike for urban riders.",Ivan P,2023-03-03,28.5,155.0
+Benelli,Imperiale 400,2022,374,3999,Classic,3.8,"Retro looks, smooth single-cylinder","Limited power for taller highways","A charming retro commuter with strong visual appeal.",Helga S,2022-05-12,24.0,195.0
+Norton,V4CR,2023,1200,39999,Sport,4.4,"Exotic engineering, bespoke performance","Extremely high price, limited availability","A rare high-end sport machine for collectors.",Rene L,2023-12-20,11.9,205.0
+Bimota,Tesi H2,2022,998,48999,Sport,4.2,"Innovative chassis, race-derived performance","Stratospheric price, niche appeal","An engineering showcase for a small enthusiast audience.",Isabella C,2022-06-30,10.9,195.0
+Moto Guzzi,Griso 8V,2021,1151,13990,Cruiser,4.0,"Unique V-twin character and torque","Older tech and heavy weight","An entertaining large-displacement cruiser with character.",Dennis R,2021-10-25,13.7,240.0
+GasGas,EC 250F,2024,250,7499,Enduro,4.3,"Excellent suspension and light handling","Purpose-built — limited street use","A top performer for modern enduro competition.",Ana P,2024-08-18,15.0,112.0
+Sherco,250 SEF Factory,2023,250,9999,Enduro,4.4,"Factory-level components, light","High cost for the segment","A competition-grade enduro machine for serious riders.",Felix H,2023-07-30,14.8,110.0
+Zero,D SR,2024,0,22995,Electric,4.3,"Longer range variant, powerful motor","Still limited top-end compared to petrol superbikes","A serious electric sport/touring oriented machine.",Nadine K,2024-05-05,0.0,230.0
+Energica,Rivale,2022,0,21500,Electric,4.2,"High torque and premium components","High price and weight","An electric sport bike with serious performance credentials.",Gabe L,2022-09-12,0.0,248.0
+Triumph,Bonneville Speedmaster,2021,1200,13900,Cruiser,4.1,"Comfortable cruiser ergonomics, refined twin","Heavy for city maneuvering","A classy cruiser suited to long relaxed rides.",Erica J,2021-04-18,22.0,245.0
+Honda,Rebel 500,2023,471,6799,Cruiser,4.0,"Easy handling, approachable ergonomics","Not for high-speed touring","A friendly cruiser aimed at new and returning riders.",Theo S,2023-08-23,24.6,183.0
+Yamaha,Tracer 9,2024,889,11499,Adventure-Touring,4.5,"Engaging engine, comfortable touring ergonomics","Some competitors offer more tech for price","A great package for sporty long-range touring.",Kiera N,2024-02-02,17.3,212.0
+Kawasaki,Z650,2023,649,7499,Naked,4.1,"Easy to ride, torquey twin","Less premium finish than pricier bikes","A great midweight naked with broad appeal.",Paul D,2023-05-17,20.9,185.0
+BMW,R18,2022,1802,17999,Cruiser,4.4,"Massive presence, excellent build quality","Weight and size require experience","A retro-inspired heavyweight cruiser for long highway miles.",Marta V,2022-11-29,10.2,355.0
+Ducati,Streetfighter V4,2023,1103,19995,Naked/Sport,4.8,"Brutal power, race-derived tech","Very intense for casual riders","A high-performance naked that doubles as a road-going superbike.",Leon Z,2023-09-09,11.8,198.0
+Suzuki,DR-Z400S,2021,398,7499,Dual-Sport,4.0,"Simple, rugged, reliable","Old-school tech compared to modern bikes","A tried-and-true dual-sport for riders wanting dependable off-road capability.",Carmen L,2021-06-06,16.9,147.0
+Harley-Davidson,Pan America 1250,2023,1250,17499,Adventure,4.3,"Big cruiser torque in an ADV package, tech-rich","Heavy and not as sharp off-road as lighter ADVs","An interesting Harley take on the adventure market.",Noah R,2023-11-13,16.0,258.0
+KTM,250 SX-F,2024,250,7999,MX,4.5,"Strong motocross performance, light","Not street legal in stock form in some markets","A race-focused motocross weapon.",Hector V,2024-06-01,13.6,104.0
+Aprilia,RS 457,2024,457,8999,Sport,4.2,"Great balance, fun twin engine","Mid-displacement limits top-end compared to larger sportbikes","A modern, lively sportbike for daily and spirited riding.",Sonia P,2024-03-03,19.5,173.0
+Indian,FTR 1200,2022,1203,12999,Naked,4.2,"Flat-track inspired chassis and character","Not the lightest or most economical","A muscular urban performance cruiser with attitude.",Quentin B,2022-08-08,16.1,223.0
+Royal Enfield,Super Meteor 650,2024,648,6499,Cruiser,4.0,"Comfortable cruiser ergonomics, affordable","Not high performance, basic electronics","A practical modern classic for casual cruising.",Amrita S,2024-10-20,21.0,207.0
+Husqvarna, Norden 901,2023,889,11499,Adventure,4.5,"Capable adventure chassis, modern electronics","Pricey compared to some rivals","A refined, capable mid-displacement ADV.",Soren T,2023-12-30,18.9,207.0
+
+Tekno,Scout X1,2022,450,5499,Street,4.0,"Balanced performance","Average wind protection","Fun around town",Reviewer001,2024-01-10,19.5,182.0
+Zenith,Pulse 350,2023,349,4299,Street,4.0,"Responsive handling","Average suspension","Great for city and canyon rides",Reviewer062,2024-02-02,24.0,155.0
+Aurora,Trail 650,2022,650,8799,Adventure,4.1,"Comfortable long-distance","Slightly heavy","Reliable touring companion",Reviewer063,2023-06-16,18.4,210.0
+Blitz,RS 125,2024,125,1599,Supermoto,3.7,"Light and fun","Not highway friendly","Perfect for urban play",Reviewer064,2024-03-20,32.0,118.0
+Celeste,Vector 800,2021,798,9599,Touring,4.2,"Spacious and comfy","Heavier than rivals","Great cross-country tool",Reviewer065,2022-11-11,15.9,235.0
+Drifter,Nomad 250,2023,249,3499,Commuter,3.8,"Excellent fuel economy","Limited torque","Very practical in traffic",Reviewer066,2023-09-29,28.9,129.0
+Elara,Velo 500,2022,499,6299,Naked,4.0,"Smooth power delivery","Average tech","A very usable everyday bike",Reviewer067,2022-12-05,20.6,185.0
+Fable,Classic 750,2024,749,8999,Classic,4.1,"Comfortable and refined","Not sporty","A refined retro cruiser",Reviewer068,2024-07-03,18.7,222.0
+Gusto,Street 220,2021,220,1899,Commuter,3.6,"Cheap to run","Small displacement","Ideal for short trips",Reviewer069,2021-05-19,29.7,148.0
+Horizon,XR 850,2023,849,11999,Adventure,4.3,"Strong midrange and luggage options","A bit heavy in town","Excellent for pairs touring",Reviewer070,2023-08-24,17.6,238.0
+Iota,Flex 300,2024,300,3599,Naked,3.9,"Agile and light","Small tank","Fun commuter bike",Reviewer071,2024-01-06,26.8,150.0
+Juno,Pathfinder 400,2022,398,4799,Adventure,4.0,"Good off-road chops","Limited shelter from wind","Great for mixed terrain",Reviewer072,2022-04-14,21.5,172.0
+Kiro,Sting 600,2023,599,7799,Naked,4.1,"Energetic twin","Firm ride","A sporty daily rider",Reviewer073,2023-11-09,19.0,180.0
+Lyra,Coast 1000,2021,1000,13999,Cruiser,4.2,"Classic V-twin feel","Bulky in city","Comfortable for long hauls",Reviewer074,2021-08-01,13.2,290.0
+Maven,Swift 200,2024,199,2299,Commuter,3.8,"Very nimble","Not for highways","Perfect urban runabout",Reviewer075,2024-05-22,31.2,133.0
+Noble,RS 900,2023,899,12499,Sport,4.4,"Rapid cornering","High maintenance cost","A great weekend weapon",Reviewer076,2023-02-28,16.1,195.0
+Opal,Journey 650,2022,649,7999,Touring,4.0,"Ergonomic for long rides","Moderate power","Comfort-first design",Reviewer077,2022-09-04,19.6,218.0
+Pax,Urban 350,2021,349,3999,Naked,3.9,"Light and flickable","Not great for two-up","Excellent city handler",Reviewer078,2021-06-18,24.8,152.0
+Quell,Dash 450,2024,450,6499,Trail,4.1,"Good trail manners","Sparse touring fit","Great for off-road excursions",Reviewer079,2024-03-12,16.4,120.0
+Ridge,Enduro 300,2023,300,7299,Enduro,4.3,"Top-level suspension","Spartan street amenities","Off-road performance focused",Reviewer080,2023-10-02,15.4,114.0
+Surya,Eco 125,2022,125,1299,Commuter,3.6,"Very economical","Minimal features","Best for short commutes",Reviewer081,2022-02-22,34.2,110.0
+Trident,GT 1100,2024,1100,13999,Touring,4.2,"Refined and powerful","Heavy overall","Excellent for long-range comfort",Reviewer082,2024-06-18,13.7,250.0
+Umbel,Street Lite 250,2023,249,2999,Street,3.8,"Affordable and light","Lacks long-range comfort","Ideal starter bike",Reviewer083,2023-07-07,27.9,142.0
+Vela,Retro 500,2022,499,5999,Classic,4.0,"Pleasant twin character","Basic electronics","Lovely retro ride",Reviewer084,2022-11-02,21.8,190.0
+Wisp,Mini 150,2021,149,1399,Commuter,3.7,"Very easy to park","Not for highways","Great for tight urban areas",Reviewer085,2021-03-30,32.5,119.0
+Xylo,Speed 750,2023,749,8899,Naked,4.1,"Strong midrange and brakes","Firm suspension","Balanced modern naked",Reviewer086,2023-05-20,19.4,184.0
+Yuma,Tracker 400,2024,399,6799,Trail,4.0,"Good all-round trail bike","Smaller tank","Very capable off-road",Reviewer087,2024-04-04,21.7,132.0
+Zion,Cruiser 1200,2022,1200,12999,Cruiser,4.2,"Comfortable and torquey","Large footprint","Excellent highway cruiser",Reviewer088,2022-12-01,14.6,265.0
+Nova,Edge 550,2024,549,7599,Naked,4.1,"Balanced chassis, modern features","Middling wind protection","A versatile mid-displacement street bike",Reviewer089,2024-07-07,19.7,189.0
+Alpha,Flash 300,2021,300,3999,Naked,3.8,"Lightweight handling","Low top speed","Great for new riders",Reviewer002,2023-02-12,27.0,140.0
+Bolt,Ranger 500,2023,495,5999,Adventure,4.1,"Comfortable seat","Heavy luggage load","Good for weekend trips",Reviewer003,2024-05-18,21.0,205.0
+Comet,Street S,2024,250,2999,Street,3.9,"Affordable","Basic electronics","City-friendly",Reviewer004,2024-08-09,28.0,150.0
+Dynamo,Racer 650,2022,650,8799,Sport,4.2,"Strong midrange","Firm suspension","Great throttle response",Reviewer005,2023-11-05,18.5,190.0
+Eos,Trail 250,2021,250,3499,Dual-Sport,3.7,"Very nimble","Small fuel tank","Ideal for trails",Reviewer006,2022-07-22,26.0,135.0
+Fenix,Classic 400,2023,398,4999,Classic,4.0,"Retro looks","Average brakes","Charming to ride",Reviewer007,2023-09-13,22.5,200.0
+Glider,GT 800,2022,800,10999,Touring,4.4,"Long-range comfort","Heavy at low speeds","Excellent highway manners",Reviewer008,2024-02-27,16.5,250.0
+Helix,One 125,2024,125,1499,Commuter,3.6,"Very economical","Limited power","Perfect for short commutes",Reviewer009,2024-04-01,35.0,115.0
+Ion,Neo 500,2023,500,6499,Street,4.0,"Smooth twin","Average suspension","Good daily rider",Reviewer010,2023-12-11,20.8,188.0
+Javelin,SP 1000,2022,998,13999,Sport,4.5,"High revving","Thirsty engine","Exhilarating on track",Reviewer011,2024-06-02,12.2,190.0
+Kite,Cruise 750,2021,749,8999,Cruiser,4.1,"Comfortable ergonomics","Heavy handling","Great V-twin feel",Reviewer012,2022-10-19,14.8,260.0
+Lumen,Urban 250,2024,249,2799,Street,3.8,"Affordable and light","Limited touring ability","Perfect for city use",Reviewer013,2024-03-08,27.5,142.0
+Mistral,Enduro 300,2023,300,7099,Enduro,4.3,"Excellent suspension","Minimal street comforts","Top off-road performer",Reviewer014,2023-08-30,15.2,118.0
+Nimbus,RS 500,2022,498,7599,Sport,4.0,"Sharp chassis","Average electronics","Fun on winding roads",Reviewer015,2023-05-21,18.6,175.0
+Orion,Classic 650,2021,648,6899,Classic,3.9,"Smooth twin","Basic tech","Pleasant cruiser",Reviewer016,2022-12-14,22.4,205.0
+Pioneer,Trail 450,2024,450,5999,Trail,4.2,"Agile off-road","Not very fast on highway","Reliable trail bike",Reviewer017,2024-06-07,17.0,122.0
+Quantum,VX 600,2023,600,7999,Naked,4.1,"Punchy engine","Firm seat","Engaging ride",Reviewer018,2023-11-30,19.3,178.0
+Raven,Blackbird 900,2022,898,10499,Touring,4.0,"Good storage options","Heavy handling in traffic","Great for long trips",Reviewer019,2023-09-16,15.4,240.0
+Saber,GTX 1000,2023,1000,12999,Sport-Touring,4.3,"Comfortable and quick","Pricier maintenance","Balanced sport-touring bike",Reviewer020,2024-01-02,13.5,215.0
+Titan,MX 250,2024,250,4999,MX,4.4,"Great suspension","Aggressive setup","Race-ready out of the box",Reviewer021,2024-05-05,16.0,106.0
+Ulysses,AD 800,2022,800,12499,Adventure,4.2,"Robust build","High weight","Ready for heavy touring",Reviewer022,2023-03-29,17.9,233.0
+Vega,Compact 300,2021,300,3199,Commuter,3.7,"Low running cost","Limited highway capability","Perfect city commuter",Reviewer023,2021-11-11,26.5,130.0
+Wave,Speed 400,2024,399,6999,Naked,4.0,"Good midrange","Average fuel tank","Fun for daily rides",Reviewer024,2024-07-20,21.0,172.0
+Xeno,RS 250,2023,250,4599,Sport,3.9,"Light and flickable","Limited top-end","Great training bike",Reviewer025,2023-10-10,24.0,148.0
+Yonder,Explorer 700,2022,700,8999,Adventure,4.3,"All-rounder","Not the lightest","Versatile long-distance bike",Reviewer026,2023-01-09,18.7,220.0
+Zephyr,Street Pro 650,2023,649,7499,Street,4.0,"Reliable engine","Average aesthetics","Solid daily rider",Reviewer027,2023-06-20,20.0,187.0
+Aero,Swift 125,2024,125,1399,Commuter,3.6,"Very light","Limited for two-up","Great for beginners",Reviewer028,2024-02-14,33.0,110.0
+Brio,Sport 450,2022,450,6799,Sport,4.1,"Good brakes","High seat height","Agile and fast",Reviewer029,2022-08-05,17.8,176.0
+Crown,Roadster 800,2021,798,9499,Classic,4.0,"Comfortable cruiser feel","Less nimble than smaller bikes","Relaxed highway cruiser",Reviewer030,2021-09-17,16.3,225.0
+Drift,Nomad 500,2023,498,7599,Adventure,4.2,"Good wind protection","Slightly heavy","Comfortable across long distances",Reviewer031,2023-04-02,20.2,210.0
+Edge,Neo 300,2024,300,3299,Naked,3.8,"Low cost","Basic components","Easy to ride",Reviewer032,2024-06-15,25.2,145.0
+Flux,TT 1000,2022,999,13999,Sport,4.6,"High performance","Harsh ergonomics","Thrilling track tool",Reviewer033,2023-11-22,11.9,193.0
+Glint,Classic S 350,2021,349,4199,Classic,3.9,"Nice retro styling","Lacks power for two-up","Easy and pleasant to ride",Reviewer034,2022-05-04,24.5,170.0
+Halo,Urbanite 150,2024,149,1699,Commuter,3.7,"Very light and cheap","Limited motorway ability","Great for city commuting",Reviewer035,2024-03-27,31.0,120.0
+Iris,Enduro Pro 450,2023,450,8999,Enduro,4.4,"Top-tier off-road performance","Not comfortable on long tarmac rides","Competition-ready enduro",Reviewer036,2023-12-03,15.6,116.0
+ Juno,Road 600,2022,599,8399,Touring,4.1,"Balanced touring package","Middleweight limits load","Reliable and steady",Reviewer037,2022-02-20,19.2,198.0
+Krono,Speedster 250,2021,249,3499,Sport,3.8,"Fun and easy","Limited range","Good learner sportbike",Reviewer038,2021-12-12,26.8,138.0
+Luxe,Majesty 1000,2023,1000,12999,Cruiser,4.0,"Premium finish","Heavy to manage in town","Comfortable highway cruiser",Reviewer039,2023-10-08,12.9,280.0
+Modo,Cafe 400,2022,399,5999,Classic,4.0,"Cafe racer aesthetic","Firm seat","A great weekend bike",Reviewer040,2022-06-18,20.5,183.0
+Nexus,Trailblazer 350,2024,349,4299,Adventure,4.1,"Light and capable","Small windscreen","Good entry-level ADV",Reviewer041,2024-01-25,22.1,160.0
+Orbit,Commuter 125,2021,125,1299,Commuter,3.6,"Very cheap to run","Limited speed","Perfect for short commutes",Reviewer042,2021-03-09,34.0,112.0
+Pulse,Hyper 750,2023,749,8999,Naked,4.2,"Torquey engine","Firm suspension","Fun in traffic and twisties",Reviewer043,2023-07-14,19.1,186.0
+Quark,Mini 200,2022,199,1799,Commuter,3.7,"Budget friendly","Very basic features","Great for new riders",Reviewer044,2022-09-21,29.4,136.0
+Rogue,Street 1000,2024,998,10999,Street,4.3,"Powerful and smooth","A bit heavy","Stable high-speed performer",Reviewer045,2024-05-02,15.1,205.0
+Surge,GTX 400,2022,398,6799,Sport,4.0,"Agile handling","Average range","Great midweight sportbike",Reviewer046,2022-11-29,21.5,174.0
+Talon,Adventure 900,2023,899,13999,Adventure,4.4,"Comfortable and capable","Pricier than some rivals","Solid long-distance ADV",Reviewer047,2023-08-19,16.9,238.0
+Umbra,Nimble 300,2021,299,2899,Naked,3.8,"Very light and fun","Not for long trips","Perfect for urban riders",Reviewer048,2021-05-31,27.8,128.0
+Vortex,Speed 600,2024,599,7999,Sport,4.1,"Responsive chassis","Hard seat","Great for spirited rides",Reviewer049,2024-02-11,18.9,172.0
+Willow,Classic 650,2022,648,6999,Classic,4.0,"Comfortable cruiser vibes","Less tech than rivals","Pleasant all-day bike",Reviewer050,2022-08-28,21.9,208.0
+Xceler,Pro 450,2023,450,7499,Trail,4.2,"Lightweight trail handling","Sparse touring options","Excels off-road",Reviewer051,2023-04-07,16.6,118.0
+Yield,Urban S 200,2024,199,2299,Commuter,3.7,"Very economical","Not for long hauls","Ideal daily commuter",Reviewer052,2024-06-24,30.9,132.0
+Zen,Pan 500,2023,498,7699,Naked,4.0,"Balanced and usable","Average dash","Good everyday bike",Reviewer053,2023-11-01,19.8,181.0
+Axel,Speed 100,2021,100,999,Supermoto,3.5,"Playful and light","Limited highway","Urban stunt fun",Reviewer054,2021-07-04,31.0,115.0
+Brunt,Explorer 1200,2022,1199,15999,Adventure,4.3,"Long range and comfort","Very heavy","Excellent for touring couples",Reviewer055,2022-03-15,14.7,285.0
+Cascade,Mini 125,2024,125,1399,Commuter,3.6,"Low running costs","Small engine","Perfect for tight city streets",Reviewer056,2024-09-09,33.5,118.0
+Drake,Twin 750,2023,749,8999,Naked,4.1,"Pleasant twin power","Basic features","Balanced and fun",Reviewer057,2023-12-12,19.2,188.0
+Echo,Trail 200,2022,199,2499,Dual-Sport,3.8,"Very light","Weak on highways","Ideal for local trails",Reviewer058,2022-10-02,28.8,123.0
+Fjord,GT 1100,2021,1100,12999,Touring,4.2,"Comfortable and refined","Weighty for city rides","Excellent for long-distance travel",Reviewer059,2021-11-20,13.8,252.0
+Gale,Street 350,2023,349,3999,Street,3.9,"Light and nimble","Limited top speed","Good commuter option",Reviewer060,2023-03-03,24.2,150.0
+Hawk,XR 500,2024,499,7999,Adventure,4.2,"Reliable long-range","Slightly dated styling","Solid and dependable",Reviewer061,2024-01-16,20.1,215.0
+
+
