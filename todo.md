@@ -15,7 +15,7 @@ Numeric budget check: if user provided a budget in conversation_history, parse n
 Attribute presence check: verify pick.reason or pick.evidence contains prioritized attribute token (e.g., "suspension", "long-travel", "travel", "soft", "firm", "damping"); if none of picks mention attribute, either ask model to retry once or flag note.
 Implementation: small function validate_and_filter(parsed_json, conversation_history) returning either valid parsed object or a signal to re-prompt/ask for clarification.~~
 
-3. Enrich vector index metadata (index-time evidence)
+3. ~~Enrich vector index metadata (index-time evidence)
 Why: retrieval will be more precise when metadata contains fields for common attributes (suspension notes, engine_cc, riding_style, price_est).
 Changes in vector.py:
 During indexing, parse the review text (or row dict) to extract:
@@ -24,7 +24,11 @@ suspension-related short notes (scan for keywords: suspension, travel, long-trav
 cylinder count or engine_cc => metadata["engine_cc"]
 ride_type => metadata["ride_type"]
 Store structured metadata per document (so main.py can show evidence from metadata rather than rely on LLM to find it).
-Small NLP snippet: a short regex/keyword extractor in vector.py prior to Document creation.
+Small NLP snippet: a short regex/keyword extractor in vector.py prior to Document creation.~~
+
+    ~~Update the prompt guidance to tell the model to prefer metadata evidence fields (e.g., "Prefer suspension_notes and engine_cc from REVIEWS when available") — small change I can apply now.~~
+    ~~Add a unit test for validate_and_filter and a test that ensures top_reviews contains the new fields for stubbed documents.~~
+    ~~Run an end-to-end interactive test with the real Chroma DB (if available) to verify retrieval/evidence flows.~~
 
 4. Make the retriever-query generation deterministic/fallback-safe
 Why: current approach asks LLM to produce a query; this is flexible but fragile.

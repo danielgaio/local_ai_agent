@@ -20,6 +20,7 @@ Priority and concision guidance:
 - If the user's most recent message requests a specific attribute (for example 'big suspension'), prioritize that attribute above all others when selecting and ranking motorcycles.
 - For each pick include a short, suspension/attribute-focused reason (max 12 words) in the `reason` field, and include an `evidence` field (one short phrase) if the reviews or specs mention the attribute; if none, set `evidence` to "none in dataset".
 - Return exactly one JSON object following the prescribed shapes. Keep reasons concise and focused on the prioritized attribute.
+ - Prefer explicit metadata fields from the REVIEWS when present (e.g., `suspension_notes`, `engine_cc`, `ride_type`, `price_usd_estimate`) as authoritative evidence; cite those fields in `evidence` when they support the pick.
 
 RESPONSE FORMAT (REQUIRED): Return a single JSON object only (no surrounding text). The object must be one of two shapes:
 
@@ -103,10 +104,27 @@ def build_llm_prompt(conversation_history: list, top_reviews: list):
     """
     convo_text = "\n".join([f"User: {m}" for m in conversation_history])
     # top_reviews are dicts with keys brand/model/year/comment/price_usd_estimate when available
-    reviews_text = "\n".join([
-        f"- {r.get('brand', '')} {r.get('model', '')} ({r.get('year', '')}): {r.get('comment', r.get('text', ''))} Price est ${r.get('price_usd_estimate', 'unknown')}"
-        for r in top_reviews
-    ])
+    # For each review, include explicit evidence fields when available so the LLM can reference them.
+    reviews_parts = []
+    for r in top_reviews:
+        brand = r.get('brand', '') or ''
+        model = r.get('model', '') or ''
+        year = r.get('year', '') or ''
+        comment = r.get('comment', r.get('text', '')) or ''
+        price = r.get('price_usd_estimate', r.get('price_est', 'unknown'))
+        suspension = r.get('suspension_notes')
+        engine = r.get('engine_cc')
+        ride = r.get('ride_type')
+        parts = [f"- {brand} {model} ({year}): {comment}"]
+        parts.append(f"Price est: ${price}")
+        if suspension:
+            parts.append(f"Suspension notes: {suspension}")
+        if engine:
+            parts.append(f"Engine (cc): {engine}")
+        if ride:
+            parts.append(f"Ride type: {ride}")
+        reviews_parts.append(" | ".join(parts))
+    reviews_text = "\n".join(reviews_parts)
     # Insert a short USER FOCUS hint using the most recent user message to prioritize attributes
     user_focus = conversation_history[-1] if conversation_history else ""
     prompt = (
@@ -118,6 +136,7 @@ def build_llm_prompt(conversation_history: list, top_reviews: list):
         "Tiny schema example (return exactly this shape, with real values):\n"
         "{'type':'recommendation', 'picks':[{'brand':'', 'model':'', 'year':0, 'price_est':0, 'reason':'(<=12 words mentioning prioritized attribute)', 'evidence':'(short phrase or \"none in dataset\")'}], 'note':''}\n"
         "If you cannot find direct evidence for the prioritized attribute inside the provided REVIEWS or metadata for a pick, set that pick's evidence to the literal string 'none in dataset'.\n"
+    "Prefer suspension_notes and engine_cc fields from REVIEWS as primary evidence when available; use comment text only as secondary support.\n"
     )
     return prompt
 
@@ -395,6 +414,9 @@ def main_cli():
                     "year": meta.get("year"),
                     "comment": meta.get("comment") or getattr(d, "page_content", ""),
                     "price_usd_estimate": meta.get("price_usd_estimate") or meta.get("price") or None,
+                    "engine_cc": meta.get("engine_cc"),
+                    "suspension_notes": meta.get("suspension_notes"),
+                    "ride_type": meta.get("ride_type"),
                     "text": getattr(d, "page_content", ""),
                 })
         except Exception as e:
