@@ -1,6 +1,6 @@
 import pytest
 
-from main import generate_retriever_query
+from main import generate_retriever_query_str as generate_retriever_query
 
 
 def test_generate_retriever_query_monkeypatch(monkeypatch):

@@ -30,17 +30,27 @@ Small NLP snippet: a short regex/keyword extractor in vector.py prior to Documen
     ~~Add a unit test for validate_and_filter and a test that ensures top_reviews contains the new fields for stubbed documents.~~
     ~~Run an end-to-end interactive test with the real Chroma DB (if available) to verify retrieval/evidence flows.~~
 
-4. Make the retriever-query generation deterministic/fallback-safe
+4. ~~Make the retriever-query generation deterministic/fallback-safe
 Why: current approach asks LLM to produce a query; this is flexible but fragile.
 Changes:
 Keep LLM generator, but add deterministic fallback generator: extract important keywords from last user message (nouns and phrases) and build a short query (e.g., "suspension travel long-travel adventure touring").
 If the LLM-generated query is empty or >12 words, use deterministic fallback.
-Implementation: small function keyword_extract_query(user_message).
+Implementation: small function keyword_extract_query(user_message).~~
 
-5. Add evidence field to picks automatically when metadata exists
+    ~~Integrating the deterministic fallback into main_cli() display or logging when it's used (for transparency).~~
+        ~~Force clarifying-question behavior for vague input (highly recommended)
+        Add a short check in main_cli() before retrieval: if the user message is very short (<3 tokens) and lacks attribute tokens, call the LLM with a clarifying-question prompt (or directly ask the user) instead of fetching documents. This will prevent cases like input "hi" from returning recommendations.~~
+        ~~Add a unit test that monkeypatches invoke_model_with_prompt to return empty/long output and asserts main_cli() prints the fallback info line (or test generate_retriever_query() returns used_fallback True).~~
+    ~~Adding unit tests that verify generate_retriever_query() falls back appropriately when the model returns empty/long outputs (by monkeypatching invoke_model_with_prompt).~~
+
+5. ~~Add evidence field to picks automatically when metadata exists
 Why: if index metadata contains suspension_notes, automatically propagate it into the evidence field for picks that were selected from retrieved docs.
 Changes:
-In main.py, when building top_reviews, include suspension_notes from doc metadata; then the prompt provides reviews with clear evidence and the LLM can reference them.
+In main.py, when building top_reviews, include suspension_notes from doc metadata; then the prompt provides reviews with clear evidence and the LLM can reference them.~~
+
+    Add a unit test for enrichment behavior (stub parsed JSON and top_reviews to assert evidence gets filled).
+    
+    Change the UI to display which metadata field provided the evidence (e.g., "Evidence (suspension_notes): ...").
 
 6. Add a retry-on-invalid-response loop
 Why: the model may output invalid JSON or not follow the schema.

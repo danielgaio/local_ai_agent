@@ -260,7 +260,9 @@ def generate_retriever_query(conversation_history: list):
     try:
         out = invoke_model_with_prompt(prompt)
         if not out:
-            return None
+            # fallback: derive a deterministic query from the most recent user message
+            fb = keyword_extract_query(conversation_history[-1] if conversation_history else "")
+            return fb, True
         # sanitize: take first non-empty line
         for ln in out.splitlines():
             ln = ln.strip().strip('"')
@@ -269,13 +271,108 @@ def generate_retriever_query(conversation_history: list):
                 try:
                     j = json.loads(ln)
                     if isinstance(j, dict) and j.get("query"):
-                        return str(j.get("query")).strip()
+                        candidate = str(j.get("query")).strip()
+                        # if candidate is too long, fallback
+                        if len(candidate.split()) > 12:
+                            fb = keyword_extract_query(conversation_history[-1] if conversation_history else "")
+                            return fb, True
+                        return candidate, False
                 except Exception:
                     pass
-                return ln
+                # if the model returned a very long line, use deterministic fallback
+                if len(ln.split()) > 12:
+                    fb = keyword_extract_query(conversation_history[-1] if conversation_history else "")
+                    return fb, True
+                return ln, False
+    except Exception:
+        fb = keyword_extract_query(conversation_history[-1] if conversation_history else "")
+        return fb, True
+    return None, False
+
+
+def generate_retriever_query_str(conversation_history: list):
+    """Compatibility wrapper that returns only the query string (old behavior)."""
+    q, _ = generate_retriever_query(conversation_history)
+    return q
+
+
+def keyword_extract_query(user_message: str):
+    """Deterministic fallback: extract important keywords from the user's last message and
+    assemble a short query (<=12 words). This is lightweight (no external NLP libs).
+    """
+    if not user_message:
+        return None
+    import re
+    msg = user_message.lower()
+    # common stopwords to remove
+    stop = set([
+        'i', 'want', 'need', 'for', 'the', 'and', 'a', 'an', 'to', 'with', 'that', 'is', 'on', 'in', 'of', 'my', 'me',
+        'it', 'are', 'please', 'would', 'like', 'want', 'looking', 'who'
+    ])
+
+    # preserve attribute and ride-type keywords with priority
+    attributes = ["long-travel", "long travel", "suspension", "travel", "damping", "soft", "firm", "comfortable", "comfort", "fork", "shock"]
+    ride_types = ["adventure", "touring", "cruiser", "sport", "offroad", "dual-sport", "enduro", "supermoto"]
+
+    tokens = re.findall(r"[0-9]+cc|[a-zA-Z0-9\-]+", msg)
+    seen = []
+    # prioritize attributes & ride types
+    for k in attributes + ride_types:
+        if k in msg and k not in seen:
+            seen.append(k)
+
+    # then add other informative tokens (excluding stopwords)
+    for t in tokens:
+        t = t.strip()
+        if not t or t in stop:
+            continue
+        if t in seen:
+            continue
+        # ignore very short tokens or pure numbers (unless cc)
+        if re.fullmatch(r"\d+", t) and not t.endswith('cc'):
+            continue
+        if len(t) <= 2:
+            continue
+        seen.append(t)
+
+    # final assembly: join unique tokens, limit to 12
+    if not seen:
+        return None
+    query_tokens = seen[:12]
+    return " ".join(query_tokens)
+
+
+def generate_clarifying_question(conversation_history: list):
+    """Ask the LLM to produce a single short clarifying question based on the recent conversation.
+    Returns the question string, or None if no useful question could be generated.
+    """
+    recent = conversation_history[-4:] if conversation_history else []
+    convo_block = "\n".join([f"- {m}" for m in recent])
+    prompt = (
+        "You are a concise assistant that asks a single short clarifying question when the user's message is vague.\n"
+        "Given the recent conversation, return exactly one short question (one line) that will help you clarify the user's needs for motorcycle recommendations. "
+        "Do not add any extra text.\n\n"
+        f"Conversation:\n{convo_block}\n"
+    )
+    try:
+        out = invoke_model_with_prompt(prompt)
+        if not out:
+            return None
+        # take first non-empty line
+        for ln in out.splitlines():
+            ln = ln.strip()
+            if not ln:
+                continue
+            # naive guard: ignore greetings
+            low = ln.lower()
+            if low in ("hi", "hello", "hey") or low.startswith("hi ") or low.startswith("hello "):
+                return None
+            # ensure it looks like a question
+            if not ln.endswith("?"):
+                ln = ln.rstrip('.') + "?"
+            return ln
     except Exception:
         return None
-    return None
 
 
 def analyze_with_llm(conversation_history: list, top_reviews: list):
@@ -320,6 +417,82 @@ def analyze_with_llm(conversation_history: list, top_reviews: list):
         except Exception:
             return f"Model retry did not return valid JSON. Raw retry response: {retry_resp}"
 
+    # Enrich picks using top_reviews metadata: if a pick lacks evidence, try to find it from the retrieved docs
+    def _enrich_picks_with_metadata(parsed_obj, top_reviews_list):
+        try:
+            if not isinstance(parsed_obj, dict):
+                return parsed_obj
+            if parsed_obj.get("type") != "recommendation":
+                return parsed_obj
+
+            def _normalize(s):
+                return (s or "").strip().lower()
+
+            def evidence_from_review(r):
+                # priority: suspension_notes, engine_cc, ride_type, price, comment/text
+                if r.get("suspension_notes"):
+                    return r.get("suspension_notes")
+                if r.get("engine_cc"):
+                    return f"{r.get('engine_cc')} cc"
+                if r.get("ride_type"):
+                    return r.get("ride_type")
+                if r.get("price_usd_estimate"):
+                    return f"Price est ${r.get('price_usd_estimate')}"
+                if r.get("comment"):
+                    return (r.get("comment") or "")[:200]
+                if r.get("text"):
+                    return (r.get("text") or "")[:200]
+                return None
+
+            picks = parsed_obj.get("picks", []) or []
+            for p in picks:
+                ev = p.get("evidence") or ""
+                if isinstance(ev, str) and ev.strip().lower() not in ("", "none", "none in dataset", "n/a", "na"):
+                    continue
+
+                brand = _normalize(p.get("brand"))
+                model = _normalize(p.get("model"))
+                year = _normalize(str(p.get("year"))) if p.get("year") is not None else ""
+
+                found = None
+                for r in top_reviews_list:
+                    # compare brand+model and optionally year
+                    rb = _normalize(r.get("brand"))
+                    rm = _normalize(r.get("model"))
+                    ry = _normalize(str(r.get("year"))) if r.get("year") is not None else ""
+                    if brand and model:
+                        if brand in rb and model in rm or rb in brand and rm in model:
+                            found = r
+                            break
+                    # fallback: match on model only
+                    if model and (model in rm or rm in model):
+                        found = r
+                        break
+                    # fallback: match on brand
+                    if brand and (brand in rb or rb in brand):
+                        found = r
+                        break
+
+                if found:
+                    new_ev = evidence_from_review(found)
+                    if new_ev:
+                        p["evidence"] = new_ev
+                        continue
+
+                # if we reach here, ensure evidence is explicit 'none in dataset' per prompt guidance
+                p["evidence"] = "none in dataset"
+
+            parsed_obj["picks"] = picks
+            return parsed_obj
+        except Exception:
+            return parsed_obj
+
+    try:
+        parsed = _enrich_picks_with_metadata(parsed, top_reviews)
+    except Exception:
+        # if enrichment fails, continue with original parsed
+        pass
+
     # If parsed successfully, convert to a readable display
     try:
         if parsed.get("type") == "clarify":
@@ -360,6 +533,21 @@ def main_cli():
 
         conversation_history.append(user_preferences)
 
+        # Quick vagueness check: if the user message is very short and doesn't contain attribute tokens,
+        # ask the LLM for a clarifying question instead of querying the retriever.
+        tokens = [t for t in user_preferences.split() if t.strip()]
+        if len(tokens) < 3:
+            # look for attribute tokens
+            low = user_preferences.lower()
+            attr_tokens = ["suspension", "travel", "long-travel", "long travel", "budget", "touring", "adventure"]
+            if not any(a in low for a in attr_tokens):
+                cq = generate_clarifying_question(conversation_history)
+                if cq:
+                    print("\nClarifying question:\n", cq)
+                    # append the clarifying question to the conversation history (so subsequent messages are contextual)
+                    conversation_history.append(cq)
+                    continue
+
         # Fetch top relevant reviews from the prebuilt retriever in vector.py
         # Ensure the retriever exported by vector.py is available
         if retriever is None:
@@ -368,7 +556,19 @@ def main_cli():
 
         # Query the retriever using a model-generated query (fallback to conversation join)
         try:
-            query = generate_retriever_query(conversation_history) or (" ".join(conversation_history[-3:]) if conversation_history else user_preferences)
+            q_res = generate_retriever_query(conversation_history)
+            if isinstance(q_res, tuple):
+                query, used_fallback = q_res
+            else:
+                # backward compatibility: single-value return
+                query = q_res
+                used_fallback = False
+            if not query:
+                query = (" ".join(conversation_history[-3:]) if conversation_history else user_preferences)
+
+            # Inform the user when the deterministic fallback was used for transparency
+            if used_fallback:
+                print("[INFO] Using deterministic fallback query for retriever (model query was empty/too long).")
             def get_docs_from_retriever(ret, q):
                 """Compatibility helper: prefer new `invoke` method, fall back to `get_relevant_documents`.
                 Normalize return shapes to a list of Document-like objects with `metadata` and `page_content`.

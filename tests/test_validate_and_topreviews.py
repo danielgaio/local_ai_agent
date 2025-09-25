@@ -77,3 +77,12 @@ def test_top_reviews_includes_metadata_fields():
     assert tr["engine_cc"] == 790
     assert "long-travel" in tr["suspension_notes"]
     assert tr["ride_type"] == "adventure"
+
+
+def test_keyword_extract_query_basic():
+    from main import keyword_extract_query
+    q = keyword_extract_query("I want long-travel suspension for adventure touring, budget $12k")
+    assert q is not None
+    # should include an attribute token and a ride type token
+    assert any(tok in q for tok in ["long-travel", "suspension", "travel"]) or "cc" in q
+    assert any(tok in q for tok in ["adventure", "touring"]) 
