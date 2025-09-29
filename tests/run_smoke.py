@@ -41,7 +41,7 @@ convo = [
     "Budget under 10000"
 ]
 
-q = generate_retriever_query(convo)
+q, fallback_used = generate_retriever_query(convo)
 if not q or '\n' in q or not isinstance(q, str) or q.strip() == '':
     print('SMOKE TEST FAILED: invalid query ->', repr(q))
     sys.exit(2)

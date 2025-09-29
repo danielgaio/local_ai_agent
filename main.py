@@ -10,17 +10,17 @@ model = OllamaLLM(model="llama3.2:3b")
 
 SYSTEM_INSTRUCTIONS = """
 You are an expert motorcycle recommender. The user will provide one or more messages describing preferences.
-Always analyze the user's messages, decide if you have enough information to recommend up to 3 motorcycles from the provided dataset, or ask a single clear follow-up question to clarify missing information.
+Always analyze the user's messages, decide if you have enough information to recommend motorcycles from the provided dataset, or ask a single clear follow-up question to clarify missing information.
 Do not rely on local deterministic keyword parsing in the client; perform the analysis and decision-making inside the model.
 When recommending, strictly enforce numeric budget constraints when provided: exclude any motorcycle whose listed price exceeds the user's stated budget. If nothing in the dataset strictly matches the budget, explicitly say so and suggest the closest alternatives under the budget or advise on raising the budget.
 Respect explicit constraints (budget, cylinder count, riding style, experience), and explain why each recommended motorcycle matches the user's preferences.
-If you need more information, ask exactly one short clarifying question. Otherwise, recommend up to 3 motorcycles from the dataset and explain your reasoning.
+If you need more information, ask exactly one short clarifying question. Otherwise, recommend motorcycles from the dataset and explain your reasoning.
 
 Priority and concision guidance:
 - If the user's most recent message requests a specific attribute (for example 'big suspension'), prioritize that attribute above all others when selecting and ranking motorcycles.
-- For each pick include a short, suspension/attribute-focused reason (max 12 words) in the `reason` field, and include an `evidence` field (one short phrase) if the reviews or specs mention the attribute; if none, set `evidence` to "none in dataset".
+- For each pick include a short, attribute-focused reason (max 12 words) in the `reason` field, and include an `evidence` field (one short phrase) if the reviews or specs mention the attribute; if none, set `evidence` to "none in dataset".
 - Return exactly one JSON object following the prescribed shapes. Keep reasons concise and focused on the prioritized attribute.
- - Prefer explicit metadata fields from the REVIEWS when present (e.g., `suspension_notes`, `engine_cc`, `ride_type`, `price_usd_estimate`) as authoritative evidence; cite those fields in `evidence` when they support the pick.
+- Prefer explicit metadata fields from the REVIEWS when present (e.g., `suspension_notes`, `engine_cc`, `ride_type`, `price_usd_estimate`) as authoritative evidence; cite those fields in `evidence` when they support the pick.
 
 RESPONSE FORMAT (REQUIRED): Return a single JSON object only (no surrounding text). The object must be one of two shapes:
 
@@ -28,15 +28,17 @@ RESPONSE FORMAT (REQUIRED): Return a single JSON object only (no surrounding tex
     {"type": "clarify", "question": "<one short question the assistant needs>"}
 
 2) Recommendation:
-    {"type": "recommendation", "picks": [ {"brand": "", "model": "", "year": 0, "price_est": 0, "reason": "", "evidence": ""}, ... up to 3 items ], "note": "optional free-text note if nothing strictly matches budget"}
+    {"type": "recommendation", "primary": {"brand": "", "model": "", "year": 0, "price_est": 0, "reason": "", "evidence": ""}, "alternatives": [{"brand": "", "model": "", "year": 0, "price_est": 0, "reason": "", "evidence": ""}, ...up to 2 items], "note": "optional free-text note if nothing strictly matches budget"}
 
 Strict rules:
 - Return exactly one JSON object and nothing else (no extra commentary). The client will parse this JSON. Follow the shapes above precisely.
-- When recommending, only include items whose numeric price_est is <= the user's stated budget (if budget provided). If none match, set "picks": [] and include an explanatory "note".
+- When recommending, select ONE primary pick that best matches the user's needs, plus up to 2 alternatives that offer different trade-offs or price points.
+- Only include items whose numeric price_est is <= the user's stated budget (if budget provided). If none match, set "primary": null and "alternatives": [] and include an explanatory "note".
 
 Template requirement (strict):
 - Each pick.reason MUST be 12 words or fewer and should explicitly mention the prioritized attribute (for example: "long-travel suspension"). If the provided REVIEWS or metadata do not contain direct evidence for the prioritized attribute, put the literal string "none in dataset" in the `evidence` field for that pick.
-- Example pick (for clarity): {"brand":"KTM","model":"790 Adventure","year":2019,"price_est":10000,"reason":"long-travel suspension for offroad comfort","evidence":"fork travel 210mm"}
+- Primary pick should be the best overall match; alternatives should offer variety (different price points, brands, or trade-offs).
+- Example: {"type":"recommendation","primary":{"brand":"KTM","model":"790 Adventure","year":2019,"price_est":10000,"reason":"excellent long-travel suspension","evidence":"fork travel 210mm"},"alternatives":[{"brand":"Honda","model":"CB500X","year":2023,"price_est":7000,"reason":"good suspension at lower price","evidence":"basic travel"}]}
 
 Return the JSON object as the entire model response.
 """
@@ -129,12 +131,12 @@ def build_llm_prompt(conversation_history: list, top_reviews: list):
     user_focus = conversation_history[-1] if conversation_history else ""
     prompt = (
         f"SYSTEM:\n{SYSTEM_INSTRUCTIONS}\n\nCONVERSATION:\n{convo_text}\n\nREVIEWS:\n{reviews_text}\n\n"
-        f"USER FOCUS: {user_focus} -- prioritize this attribute when ranking and in each reason.\n\n"
-        "TASK: Based on the conversation above, either ask one short clarifying question (if you need more info) or recommend up to 3 motorcycles from the REVIEWS that best match the user's needs. Be explicit about why each pick matches.\n\n"
+        f"USER FOCUS: {user_focus} -- prioritize this attribute when selecting the primary pick and alternatives.\n\n"
+        "TASK: Based on the conversation above, either ask one short clarifying question (if you need more info) or recommend motorcycles from the REVIEWS with one primary pick and up to 2 alternatives. Be explicit about why each pick matches.\n\n"
         "RESPONSE EXAMPLE AND GUIDANCE:\n"
         "Return exactly one JSON object as specified in SYSTEM instructions.\n"
         "Tiny schema example (return exactly this shape, with real values):\n"
-        "{'type':'recommendation', 'picks':[{'brand':'', 'model':'', 'year':0, 'price_est':0, 'reason':'(<=12 words mentioning prioritized attribute)', 'evidence':'(short phrase or \"none in dataset\")'}], 'note':''}\n"
+        "{'type':'recommendation', 'primary':{'brand':'', 'model':'', 'year':0, 'price_est':0, 'reason':'(<=12 words mentioning prioritized attribute)', 'evidence':'(short phrase or \"none in dataset\")'}, 'alternatives':[{'brand':'', 'model':'', 'year':0, 'price_est':0, 'reason':'(<=12 words)', 'evidence':'(short phrase or \"none in dataset\")'}], 'note':''}\n"
         "If you cannot find direct evidence for the prioritized attribute inside the provided REVIEWS or metadata for a pick, set that pick's evidence to the literal string 'none in dataset'.\n"
     "Prefer suspension_notes and engine_cc fields from REVIEWS as primary evidence when available; use comment text only as secondary support.\n"
     )
@@ -148,7 +150,7 @@ def validate_and_filter(parsed: dict, conversation_history: list):
 
     Behaviour implemented:
     - Numeric budget check: parse a budget from conversation_history (simple regex). If found,
-      remove picks whose price_est > budget. If none remain, set picks=[] and return valid with a note.
+      remove picks whose price_est > budget. For new format, filter primary and alternatives.
     - Attribute presence check: determines prioritized attribute token from last user message and checks
       that at least one pick mentions that attribute in 'reason' or 'evidence'. If no picks mention it,
       suggest a retry (action='retry') so the model can try again.
@@ -161,7 +163,19 @@ def validate_and_filter(parsed: dict, conversation_history: list):
             # nothing to validate for clarifying questions
             return True, parsed
 
-        picks = parsed.get("picks", []) or []
+        # Handle both old format (picks array) and new format (primary + alternatives)
+        if "picks" in parsed:
+            # Old format compatibility
+            picks = parsed.get("picks", []) or []
+            all_picks = picks
+        else:
+            # New format: primary + alternatives
+            primary = parsed.get("primary")
+            alternatives = parsed.get("alternatives", []) or []
+            all_picks = []
+            if primary:
+                all_picks.append(primary)
+            all_picks.extend(alternatives)
 
         # Simple budget extraction: find the last numeric token in the conversation that looks like a money value
         joined = " ".join(conversation_history or [])
@@ -182,34 +196,51 @@ def validate_and_filter(parsed: dict, conversation_history: list):
             except Exception:
                 budget = None
 
-        # If budget present, filter out picks that exceed it
-        if budget is not None and picks:
-            valid_picks = []
-            for p in picks:
-                price = p.get("price_est")
-                try:
-                    # Some responses may use strings; sanitize
-                    if isinstance(price, str):
-                        price_clean = re.sub(r"[^0-9.]", "", price)
-                        price_val = float(price_clean) if price_clean else None
-                    else:
-                        price_val = float(price) if price is not None else None
-                except Exception:
-                    price_val = None
-
-                if price_val is None:
-                    # keep items with unknown price for now
-                    valid_picks.append(p)
+        # Helper function to check if a pick is within budget
+        def is_within_budget(pick, budget_limit):
+            if budget_limit is None:
+                return True
+            price = pick.get("price_est")
+            try:
+                # Some responses may use strings; sanitize
+                if isinstance(price, str):
+                    price_clean = re.sub(r"[^0-9.]", "", price)
+                    price_val = float(price_clean) if price_clean else None
                 else:
-                    if price_val <= float(budget):
-                        valid_picks.append(p)
-            if not valid_picks:
-                # No picks under budget — enforce requirement: set picks empty and include explanatory note
-                parsed["picks"] = []
-                parsed["note"] = parsed.get("note") or f"No items at or below the parsed budget ${int(budget)} found in dataset."
-                return True, parsed
+                    price_val = float(price) if price is not None else None
+            except Exception:
+                price_val = None
+            
+            if price_val is None:
+                return True  # keep items with unknown price for now
+            return price_val <= float(budget_limit)
+
+        # If budget present, filter out picks that exceed it
+        if budget is not None and all_picks:
+            if "picks" in parsed:
+                # Old format
+                valid_picks = [p for p in all_picks if is_within_budget(p, budget)]
+                if not valid_picks:
+                    parsed["picks"] = []
+                    parsed["note"] = parsed.get("note") or f"No items at or below the parsed budget ${int(budget)} found in dataset."
+                else:
+                    parsed["picks"] = valid_picks
             else:
-                parsed["picks"] = valid_picks
+                # New format: filter primary and alternatives separately
+                primary = parsed.get("primary")
+                alternatives = parsed.get("alternatives", [])
+                
+                # Filter primary
+                if primary and not is_within_budget(primary, budget):
+                    parsed["primary"] = None
+                
+                # Filter alternatives
+                valid_alternatives = [a for a in alternatives if is_within_budget(a, budget)]
+                parsed["alternatives"] = valid_alternatives
+                
+                # If no primary and no alternatives remain, add note
+                if not parsed.get("primary") and not parsed.get("alternatives"):
+                    parsed["note"] = parsed.get("note") or f"No items at or below the parsed budget ${int(budget)} found in dataset."
 
         # Attribute presence check: derive prioritized attribute from most recent user message
         prioritized = None
@@ -233,8 +264,17 @@ def validate_and_filter(parsed: dict, conversation_history: list):
                         return True
                 return False
 
-            if parsed.get("picks"):
-                any_mention = any(mentions_attr(p) for p in parsed.get("picks", []))
+            # Check all picks for attribute mentions
+            remaining_picks = []
+            if "picks" in parsed:
+                remaining_picks = parsed.get("picks", [])
+            else:
+                if parsed.get("primary"):
+                    remaining_picks.append(parsed.get("primary"))
+                remaining_picks.extend(parsed.get("alternatives", []))
+            
+            if remaining_picks:
+                any_mention = any(mentions_attr(p) for p in remaining_picks)
                 if not any_mention:
                     # tell the caller to retry once — the model should include the attribute in reasons or evidence
                     return False, {"reason": f"None of the picks mention the prioritized attribute '{prioritized}' in reason or evidence.", "action": "retry", "attribute": prioritized}
@@ -430,25 +470,26 @@ def analyze_with_llm(conversation_history: list, top_reviews: list):
 
             def evidence_from_review(r):
                 # priority: suspension_notes, engine_cc, ride_type, price, comment/text
+                # returns tuple (evidence, source_field) or None
                 if r.get("suspension_notes"):
-                    return r.get("suspension_notes")
+                    return r.get("suspension_notes"), "suspension_notes"
                 if r.get("engine_cc"):
-                    return f"{r.get('engine_cc')} cc"
+                    return f"{r.get('engine_cc')} cc", "engine_cc"
                 if r.get("ride_type"):
-                    return r.get("ride_type")
+                    return r.get("ride_type"), "ride_type"
                 if r.get("price_usd_estimate"):
-                    return f"Price est ${r.get('price_usd_estimate')}"
+                    return f"Price est ${r.get('price_usd_estimate')}", "price_usd_estimate"
                 if r.get("comment"):
-                    return (r.get("comment") or "")[:200]
+                    return (r.get("comment") or "")[:200], "comment"
                 if r.get("text"):
-                    return (r.get("text") or "")[:200]
+                    return (r.get("text") or "")[:200], "text"
                 return None
 
-            picks = parsed_obj.get("picks", []) or []
-            for p in picks:
+            # Helper function to enrich a single pick
+            def enrich_pick(p, top_reviews_list):
                 ev = p.get("evidence") or ""
                 if isinstance(ev, str) and ev.strip().lower() not in ("", "none", "none in dataset", "n/a", "na"):
-                    continue
+                    return
 
                 brand = _normalize(p.get("brand"))
                 model = _normalize(p.get("model"))
@@ -474,15 +515,32 @@ def analyze_with_llm(conversation_history: list, top_reviews: list):
                         break
 
                 if found:
-                    new_ev = evidence_from_review(found)
-                    if new_ev:
-                        p["evidence"] = new_ev
-                        continue
+                    ev_result = evidence_from_review(found)
+                    if ev_result:
+                        evidence_text, source_field = ev_result
+                        p["evidence"] = evidence_text
+                        p["evidence_source"] = source_field
+                        return
 
                 # if we reach here, ensure evidence is explicit 'none in dataset' per prompt guidance
                 p["evidence"] = "none in dataset"
 
-            parsed_obj["picks"] = picks
+            # Handle both old format (picks array) and new format (primary + alternatives)
+            if "picks" in parsed_obj:
+                # Old format
+                picks = parsed_obj.get("picks", []) or []
+                for p in picks:
+                    enrich_pick(p, top_reviews_list)
+                parsed_obj["picks"] = picks
+            else:
+                # New format: enrich primary and alternatives
+                primary = parsed_obj.get("primary")
+                if primary:
+                    enrich_pick(primary, top_reviews_list)
+                
+                alternatives = parsed_obj.get("alternatives", []) or []
+                for alt in alternatives:
+                    enrich_pick(alt, top_reviews_list)
             return parsed_obj
         except Exception:
             return parsed_obj
@@ -498,17 +556,56 @@ def analyze_with_llm(conversation_history: list, top_reviews: list):
         if parsed.get("type") == "clarify":
             return parsed.get("question", "(no question provided)")
         elif parsed.get("type") == "recommendation":
-            picks = parsed.get("picks", [])
-            lines = ["Top recommendations:"]
-            if not picks:
-                note = parsed.get("note", "No recommendations match the strict budget or constraints.")
-                lines.append(f"No picks matched strictly. Note: {note}")
+            # Handle both old format (picks array) and new format (primary + alternatives)
+            if "primary" in parsed or "alternatives" in parsed:
+                # New format: primary + alternatives
+                primary = parsed.get("primary")
+                alternatives = parsed.get("alternatives", [])
+                lines = []
+                
+                if primary:
+                    # Display primary pick prominently
+                    lines.append("Top recommendation:")
+                    ev = primary.get('evidence')
+                    ev_source = primary.get('evidence_source')
+                    if ev and ev_source:
+                        ev_text = f" Evidence ({ev_source}): {ev}"
+                    elif ev:
+                        ev_text = f" Evidence: {ev}"
+                    else:
+                        ev_text = ""
+                    lines.append(f"• {primary.get('brand')} {primary.get('model')} ({primary.get('year')}), Price est: ${primary.get('price_est')}. Reason: {primary.get('reason')}.{ev_text}")
+                    
+                    # Display alternatives concisely if present
+                    if alternatives:
+                        lines.append("\nAlternatives:")
+                        for alt in alternatives:
+                            lines.append(f"• {alt.get('brand')} {alt.get('model')} ({alt.get('year')}) - ${alt.get('price_est')}. {alt.get('reason')}")
+                else:
+                    # No primary pick
+                    note = parsed.get("note", "No recommendations match the strict budget or constraints.")
+                    lines.append(f"No picks matched strictly. Note: {note}")
+                    
             else:
-                for p in picks:
-                    ev = p.get('evidence')
-                    ev_text = f" Evidence: {ev}" if ev else ""
-                    lines.append(f"- {p.get('brand')} {p.get('model')} ({p.get('year')}), Price est: ${p.get('price_est')}. Reason: {p.get('reason')}.{ev_text}")
-            if parsed.get("note") and picks:
+                # Old format: picks array (for backward compatibility)
+                picks = parsed.get("picks", [])
+                lines = ["Top recommendations:"]
+                if not picks:
+                    note = parsed.get("note", "No recommendations match the strict budget or constraints.")
+                    lines.append(f"No picks matched strictly. Note: {note}")
+                else:
+                    for p in picks:
+                        ev = p.get('evidence')
+                        ev_source = p.get('evidence_source')
+                        if ev and ev_source:
+                            ev_text = f" Evidence ({ev_source}): {ev}"
+                        elif ev:
+                            ev_text = f" Evidence: {ev}"
+                        else:
+                            ev_text = ""
+                        lines.append(f"- {p.get('brand')} {p.get('model')} ({p.get('year')}), Price est: ${p.get('price_est')}. Reason: {p.get('reason')}.{ev_text}")
+                        
+            if parsed.get("note") and (parsed.get("primary") or parsed.get("picks")):
                 lines.append(f"Note: {parsed.get('note')}")
             return "\n".join(lines)
         else:
@@ -624,13 +721,72 @@ def main_cli():
             sys.exit(1)
 
         # Let the LLM analyze the conversation history and decide whether to ask a follow-up or recommend
-        llm_response = analyze_with_llm(conversation_history, top_reviews)
-        # Surface any LLM invocation errors directly to the user (no local fallback)
-        if isinstance(llm_response, str) and llm_response.startswith("Error invoking model.generate"):
-            print("[ERROR] LLM invocation failed:\n")
-            print(llm_response)
-            # continue loop so the user can try again or quit
+        # Implement retry-on-invalid-response loop with up to 1 retry
+        max_retries = 1
+        retry_count = 0
+        llm_response = None
+        
+        while retry_count <= max_retries:
+            try:
+                llm_response = analyze_with_llm(conversation_history, top_reviews)
+                
+                # Check if response indicates a validation failure or JSON parsing error
+                if isinstance(llm_response, str):
+                    # Check for specific error patterns that indicate retry-worthy failures
+                    error_indicators = [
+                        "Model retry failed validation:",
+                        "Model retry did not return valid JSON",
+                        "Error invoking model"
+                    ]
+                    
+                    is_retry_worthy_error = any(indicator in llm_response for indicator in error_indicators)
+                    
+                    if is_retry_worthy_error and retry_count < max_retries:
+                        print(f"[RETRY {retry_count + 1}/{max_retries}] LLM response didn't follow the required format, retrying...")
+                        retry_count += 1
+                        continue
+                    elif is_retry_worthy_error and retry_count >= max_retries:
+                        # Exhausted retries, provide helpful error message
+                        print("[ERROR] LLM failed to provide a valid response after multiple attempts.")
+                        print("This may be due to:")
+                        print("- The model not following the JSON schema requirements")
+                        print("- Budget constraints that can't be met with available data")
+                        print("- Missing attribute evidence in the dataset")
+                        print("Try rephrasing your request or adjusting your requirements.\n")
+                        print("Debug info:", llm_response[:200] + ("..." if len(llm_response) > 200 else ""))
+                        break
+                    elif llm_response.startswith("Error invoking model.generate"):
+                        # Surface LLM invocation errors directly to the user (no retry for connection issues)
+                        print("[ERROR] LLM invocation failed:\n")
+                        print(llm_response)
+                        break
+                
+                # If we get here, either the response is valid or we've exhausted retries
+                break
+                
+            except Exception as e:
+                if retry_count < max_retries:
+                    print(f"[RETRY {retry_count + 1}/{max_retries}] Unexpected error during LLM analysis, retrying...")
+                    retry_count += 1
+                    continue
+                else:
+                    print(f"[ERROR] Failed to get valid response from LLM after {max_retries + 1} attempts.")
+                    print("This could be due to:")
+                    print("- Temporary connectivity issues with the Ollama service") 
+                    print("- Model loading problems")
+                    print("- Invalid conversation context")
+                    print(f"Last error: {e}")
+                    llm_response = None
+                    break
+        
+        # Handle final response or error
+        if llm_response is None:
+            print("[ERROR] No response received from LLM after all attempts")
             continue
+        elif isinstance(llm_response, str) and llm_response.startswith("[ERROR]"):
+            print(llm_response)
+            continue
+        
         print(llm_response)
 
 

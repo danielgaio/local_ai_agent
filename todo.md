@@ -50,23 +50,23 @@ In main.py, when building top_reviews, include suspension_notes from doc metadat
 
     ~~Add a unit test for enrichment behavior (stub parsed JSON and top_reviews to assert evidence gets filled).~~
     
-    Change the UI to display which metadata field provided the evidence (e.g., "Evidence (suspension_notes): ...").
+    ~~Change the UI to display which metadata field provided the evidence (e.g., "Evidence (suspension_notes): ...").~~
 
-6. Add a retry-on-invalid-response loop
+6. ~~Add a retry-on-invalid-response loop
 Why: the model may output invalid JSON or not follow the schema.
 Behavior:
 If parsed JSON fails budget/attribute checks, reprompt the LLM with a short message: "Previous response did not meet X; please return again following the JSON schema" — allow 1 retry then surface a clear error.
-Implementation: small loop in main.py around analyze_with_llm call.
+Implementation: small loop in main.py around analyze_with_llm call.~~
 
-7. Tests and smoke checks (automated)
+7. ~~Tests and smoke checks (automated)
 Add fast unit tests:
 test_index_metadata_presence: that vector.py sets suspension_notes and price metadata.
 test_llm_response_shape: stub invoke_model_with_prompt to return valid/invalid JSON and test analyze_with_llm behavior.
 test_budget_enforcement: run parse->validate pipeline on sample parsed JSON with budget.
-Add one smoke script that runs python main.py with a piped input sample and asserts output contains "Top recommendations" or a clarifying question.
+Add one smoke script that runs python main.py with a piped input sample and asserts output contains "Top recommendations" or a clarifying question.~~
 
-8. UX: return 1 primary pick + 1-2 alternatives (concise)
-Implementation: change prompt to instruct model to mark one primary; client displays primary first and succinct alternatives.
+8. ~~UX: return 1 primary pick + 1-2 alternatives (concise)
+Implementation: change prompt to instruct model to mark one primary; client displays primary first and succinct alternatives.~~
 
 9. Add requirements and README (developer ergonomics)
 Ensure requirements.txt includes exact libs used: langchain, langchain-chroma or chromadb, langchain-ollama/ollama, pandas, chromadb adapter versions. Provide a README with steps to rebuild chroma_langchain_db.
