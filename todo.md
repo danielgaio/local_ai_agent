@@ -48,7 +48,7 @@ Why: if index metadata contains suspension_notes, automatically propagate it int
 Changes:
 In main.py, when building top_reviews, include suspension_notes from doc metadata; then the prompt provides reviews with clear evidence and the LLM can reference them.~~
 
-    Add a unit test for enrichment behavior (stub parsed JSON and top_reviews to assert evidence gets filled).
+    ~~Add a unit test for enrichment behavior (stub parsed JSON and top_reviews to assert evidence gets filled).~~
     
     Change the UI to display which metadata field provided the evidence (e.g., "Evidence (suspension_notes): ...").
 
