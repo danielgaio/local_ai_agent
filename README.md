@@ -1,5 +1,7 @@
 # local_ai_agent (developer README)
 
+[![CI](https://github.com/danielgaio/local_ai_agent/actions/workflows/ci.yml/badge.svg)](https://github.com/danielgaio/local_ai_agent/actions/workflows/ci.yml)
+
 This repository provides a small local RAG-powered motorcycle recommender using Ollama (LLM) and ChromaDB (vector store).
 
 Prerequisites
