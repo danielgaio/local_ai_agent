@@ -129,6 +129,8 @@ def build_llm_prompt(conversation_history: list, top_reviews: list):
     reviews_text = "\n".join(reviews_parts)
     # Insert a short USER FOCUS hint using the most recent user message to prioritize attributes
     user_focus = conversation_history[-1] if conversation_history else ""
+    # lightly spell-correct obvious misspellings for the focus hint
+    user_focus = simple_spell_correct(user_focus)
     prompt = (
         f"SYSTEM:\n{SYSTEM_INSTRUCTIONS}\n\nCONVERSATION:\n{convo_text}\n\nREVIEWS:\n{reviews_text}\n\n"
         f"USER FOCUS: {user_focus} -- prioritize this attribute when selecting the primary pick and alternatives.\n\n"
@@ -141,6 +143,25 @@ def build_llm_prompt(conversation_history: list, top_reviews: list):
     "Prefer suspension_notes and engine_cc fields from REVIEWS as primary evidence when available; use comment text only as secondary support.\n"
     )
     return prompt
+
+
+def simple_spell_correct(text: str) -> str:
+    """Very small, deterministic spell-corrections for common typos relevant to this domain."""
+    if not text:
+        return text
+    corrections = {"suspention": "suspension", "longtravel": "long-travel"}
+    out = text
+    for k, v in corrections.items():
+        out = out.replace(k, v)
+        out = out.replace(k.capitalize(), v)
+    return out
+
+
+def log_debug(msg: str):
+    """Simple debug logger controlled by AIAGENT_DEBUG env var."""
+    import os
+    if os.environ.get("AIAGENT_DEBUG", "0") in ("1", "true", "True"):
+        print("[DEBUG] ", msg)
 
 
 def validate_and_filter(parsed: dict, conversation_history: list):
@@ -568,9 +589,7 @@ def analyze_with_llm(conversation_history: list, top_reviews: list):
                     lines.append("Top recommendation:")
                     ev = primary.get('evidence')
                     ev_source = primary.get('evidence_source')
-                    if ev and ev_source:
-                        ev_text = f" Evidence ({ev_source}): {ev}"
-                    elif ev:
+                    if ev:
                         ev_text = f" Evidence: {ev}"
                     else:
                         ev_text = ""
@@ -597,9 +616,7 @@ def analyze_with_llm(conversation_history: list, top_reviews: list):
                     for p in picks:
                         ev = p.get('evidence')
                         ev_source = p.get('evidence_source')
-                        if ev and ev_source:
-                            ev_text = f" Evidence ({ev_source}): {ev}"
-                        elif ev:
+                        if ev:
                             ev_text = f" Evidence: {ev}"
                         else:
                             ev_text = ""
@@ -710,7 +727,8 @@ def main_cli():
                     "model": meta.get("model"),
                     "year": meta.get("year"),
                     "comment": meta.get("comment") or getattr(d, "page_content", ""),
-                    "price_usd_estimate": meta.get("price_usd_estimate") or meta.get("price") or None,
+                    "price_usd_estimate": (int(meta.get("price_usd_estimate")) if meta.get("price_usd_estimate") is not None else (int(meta.get("price")) if meta.get("price") is not None else None)),
+                    "price_est": (int(meta.get("price_usd_estimate")) if meta.get("price_usd_estimate") is not None else (int(meta.get("price")) if meta.get("price") is not None else None)),
                     "engine_cc": meta.get("engine_cc"),
                     "suspension_notes": meta.get("suspension_notes"),
                     "ride_type": meta.get("ride_type"),

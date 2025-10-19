@@ -1,5 +1,7 @@
-pandas
-langchain
-langchain-ollama
-langchain-chroma
 pytest
+pandas>=2.3.3
+chromadb>=0.3.26
+langchain>=0.0.200
+langchain-ollama>=0.0.3
+langchain-chroma>=0.0.3
+ollama>=0.1.0
