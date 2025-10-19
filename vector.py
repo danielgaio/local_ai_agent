@@ -1,12 +1,65 @@
-from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 import os
 import pandas as pd
 import re
 
+# Try to use OllamaEmbeddings where available; fall back to a lightweight
+# DummyEmbeddings implementation when running in CI or if Ollama isn't
+# accessible. This avoids network calls during GitHub Actions runs.
+try:
+    # Import lazily so importing this module doesn't immediately fail on systems
+    # without the ollama client installed.
+    from langchain_ollama import OllamaEmbeddings  # type: ignore
+except Exception:
+    OllamaEmbeddings = None  # type: ignore
+
 df = pd.read_csv("motorcycle_reviews.csv")
-embeddings = OllamaEmbeddings(model="mxbai-embed-large")
+
+# Determine whether to force using a dummy embeddings implementation.
+# GitHub Actions sets GITHUB_ACTIONS=true; CI environments often set CI=true.
+_ci_env = os.getenv("GITHUB_ACTIONS") == "true" or os.getenv("CI") == "true"
+_use_dummy = os.getenv("USE_DUMMY_EMBEDDINGS") == "1" or _ci_env
+
+
+class DummyEmbeddings:
+    """A tiny deterministic embedding generator for CI/tests.
+
+    Produces short fixed-size vectors derived from an MD5 hash of the
+    input text. This is fast, deterministic and doesn't require network
+    access.
+    """
+
+    def __init__(self, dim: int = 32):
+        self.dim = dim
+
+    def embed_documents(self, texts):
+        import hashlib
+
+        out = []
+        for t in texts:
+            h = hashlib.md5(t.encode("utf-8")).hexdigest()
+            # Turn pairs of hex chars into bytes and normalize to [0,1]
+            vals = [int(h[i : i + 2], 16) / 255.0 for i in range(0, min(len(h), self.dim * 2), 2)]
+            # If we produced fewer than dim values (shouldn't normally happen), pad with zeros
+            if len(vals) < self.dim:
+                vals.extend([0.0] * (self.dim - len(vals)))
+            out.append([float(x) for x in vals[: self.dim]])
+        return out
+
+    def embed_query(self, text):
+        return self.embed_documents([text])[0]
+
+
+# Prefer real Ollama embeddings when available and not explicitly disabled.
+if not _use_dummy and OllamaEmbeddings is not None:
+    try:
+        embeddings = OllamaEmbeddings(model="mxbai-embed-large")
+    except Exception:
+        # Fall back to dummy if Ollama cannot be initialized at runtime.
+        embeddings = DummyEmbeddings()
+else:
+    embeddings = DummyEmbeddings()
 
 db_location = "./chroma_langchain_db"
 add_documents = not os.path.exists(db_location)
