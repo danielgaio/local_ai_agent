@@ -67,3 +67,18 @@ Notes
 Contact
 -------
 If you change indexing code or dependencies, update this README accordingly.
+
+CI and test environment notes
+----------------------------
+On GitHub Actions and many CI environments the project can't contact a local Ollama
+server. To make tests deterministic and fast in CI we use a lightweight, local
+fallback for embeddings when running under CI or when the environment variable
+`USE_DUMMY_EMBEDDINGS=1` is set.
+
+- CI runners: the code automatically detects `GITHUB_ACTIONS=true` or `CI=true`
+	and will use the dummy embeddings implementation.
+- Local dev: if you have Ollama installed and running, the project will use
+	`OllamaEmbeddings` by default. To force the dummy embeddings locally set
+	`USE_DUMMY_EMBEDDINGS=1` in your environment.
+
+This keeps unit tests fast and avoids external service dependency during CI runs.
