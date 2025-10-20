@@ -157,6 +157,58 @@ def simple_spell_correct(text: str) -> str:
     return out
 
 
+def is_vague_input(text: str) -> bool:
+    """Return True if the user's input is vague (greeting/pleasantry or lacks informative tokens).
+
+    Rules:
+    - If text contains obvious attribute tokens (suspension, travel, budget, etc.) it's not vague.
+    - If text matches common greetings or pleasantries ("hi", "hello", "how are you", "what's up"), it's vague.
+    - Otherwise, compute informative tokens by removing stopwords and punctuation; if too few remain, treat as vague.
+    """
+    if not text or not text.strip():
+        return True
+    low = text.lower().strip()
+    # attribute tokens that indicate a substantive request
+    attr_tokens = ["suspension", "travel", "long-travel", "long travel", "budget", "touring", "adventure", "engine", "cc", "price"]
+    for a in attr_tokens:
+        if a in low:
+            return False
+
+    # common greeting/pleasantry patterns
+    greetings = [
+        "hi",
+        "hello",
+        "hey",
+        "how are you",
+        "how's it going",
+        "what's up",
+        "how are ya",
+        "how r u",
+        "good morning",
+        "good afternoon",
+        "good evening",
+    ]
+    for g in greetings:
+        if low == g or low.startswith(g + " ") or low.endswith(" " + g) or (g in low and len(low.split()) <= 4):
+            return True
+
+    # Remove punctuation and split into tokens
+    import re
+    tokens = re.findall(r"[A-Za-z0-9\-']+", low)
+    if not tokens:
+        return True
+
+    # lightweight stopword set
+    stop = set([
+        'i', 'want', 'need', 'for', 'the', 'and', 'a', 'an', 'to', 'with', 'that', 'is', 'on', 'in', 'of', 'my', 'me',
+        'it', 'are', 'please', 'would', 'like', 'looking', 'who', 'how', 'what', 'your', 'you', 'we'
+    ])
+
+    informative = [t for t in tokens if t not in stop and len(t) > 2]
+    # If there are fewer than 2 informative tokens, consider this vague
+    return len(informative) < 2
+
+
 def log_debug(msg: str):
     """Simple debug logger controlled by AIAGENT_DEBUG env var."""
     import os
@@ -647,20 +699,14 @@ def main_cli():
 
         conversation_history.append(user_preferences)
 
-        # Quick vagueness check: if the user message is very short and doesn't contain attribute tokens,
-        # ask the LLM for a clarifying question instead of querying the retriever.
-        tokens = [t for t in user_preferences.split() if t.strip()]
-        if len(tokens) < 3:
-            # look for attribute tokens
-            low = user_preferences.lower()
-            attr_tokens = ["suspension", "travel", "long-travel", "long travel", "budget", "touring", "adventure"]
-            if not any(a in low for a in attr_tokens):
-                cq = generate_clarifying_question(conversation_history)
-                if cq:
-                    print("\nClarifying question:\n", cq)
-                    # append the clarifying question to the conversation history (so subsequent messages are contextual)
-                    conversation_history.append(cq)
-                    continue
+        # Better vagueness detection: ask a clarifying question for greetings/pleasantries or otherwise vague input
+        if is_vague_input(user_preferences):
+            cq = generate_clarifying_question(conversation_history)
+            if cq:
+                print("\nClarifying question:\n", cq)
+                # append the clarifying question to the conversation history (so subsequent messages are contextual)
+                conversation_history.append(cq)
+                continue
 
         # Fetch top relevant reviews from the prebuilt retriever in vector.py
         # Ensure the retriever exported by vector.py is available
