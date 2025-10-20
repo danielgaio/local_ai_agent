@@ -1,12 +1,61 @@
-from langchain_ollama.llms import OllamaLLM
+import os
 import json
 import sys
+from typing import Any
+
+# Configurable model provider: choose 'ollama' (default) or 'openai' via env var MODEL_PROVIDER
+_MODEL_PROVIDER = os.getenv("MODEL_PROVIDER", "ollama").lower()
+
+# Try optional imports for LLM backends. Keep imports lazy/optional so CI without extra deps still works.
+OllamaLLM = None
+OpenAI = None
+try:
+    from langchain_ollama.llms import OllamaLLM  # type: ignore
+except Exception:
+    OllamaLLM = None
+
+try:
+    # langchain OpenAI wrapper (optional)
+    from langchain.llms import OpenAI  # type: ignore
+except Exception:
+    OpenAI = None
 # Use the prebuilt retriever exported by vector.py. This module must provide a `retriever` variable.
 from vector import retriever
 
 
-# Initialize model
-model = OllamaLLM(model="llama3.2:3b")
+def get_llm() -> Any:
+    """Return an LLM object according to MODEL_PROVIDER. Falls back safely.
+
+    - MODEL_PROVIDER=ollama (default): use OllamaLLM(model="llama3.2:3b") if available.
+    - MODEL_PROVIDER=openai: use langchain's OpenAI LLM (requires OPENAI_API_KEY).
+
+    If the requested provider is unavailable, prefer any available implementation, or raise an informative error.
+    """
+    provider = _MODEL_PROVIDER
+    if provider == "openai" and OpenAI is not None:
+        # OpenAI via LangChain will read OPENAI_API_KEY from env; create a low-temp deterministic LLM
+        return OpenAI(temperature=0)
+
+    if provider == "ollama" and OllamaLLM is not None:
+        try:
+            return OllamaLLM(model="llama3.2:3b")
+        except Exception:
+            # fall through to other available LLMs
+            pass
+
+    # Fallback: prefer Ollama if available, else OpenAI if available, else raise
+    if OllamaLLM is not None:
+        return OllamaLLM(model="llama3.2:3b")
+    if OpenAI is not None:
+        return OpenAI(temperature=0)
+
+    raise RuntimeError(
+        "No LLM provider available. Install and configure Ollama or OpenAI (set MODEL_PROVIDER)."
+    )
+
+
+# Initialize model using configured provider
+model = get_llm()
 
 SYSTEM_INSTRUCTIONS = """
 You are an expert motorcycle recommender. The user will provide one or more messages describing preferences.

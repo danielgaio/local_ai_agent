@@ -4,15 +4,21 @@ import os
 import pandas as pd
 import re
 
-# Try to use OllamaEmbeddings where available; fall back to a lightweight
-# DummyEmbeddings implementation when running in CI or if Ollama isn't
-# accessible. This avoids network calls during GitHub Actions runs.
+_MODEL_PROVIDER = os.getenv("MODEL_PROVIDER", "ollama").lower()
+
+# Try to import optional embedding backends. We prefer the provider set by MODEL_PROVIDER
+OllamaEmbeddings = None
+OpenAIEmbeddings = None
 try:
-    # Import lazily so importing this module doesn't immediately fail on systems
-    # without the ollama client installed.
     from langchain_ollama import OllamaEmbeddings  # type: ignore
 except Exception:
     OllamaEmbeddings = None  # type: ignore
+
+try:
+    # LangChain OpenAI embeddings wrapper (optional)
+    from langchain.embeddings import OpenAIEmbeddings  # type: ignore
+except Exception:
+    OpenAIEmbeddings = None
 
 df = pd.read_csv("motorcycle_reviews.csv")
 
@@ -51,15 +57,41 @@ class DummyEmbeddings:
         return self.embed_documents([text])[0]
 
 
-# Prefer real Ollama embeddings when available and not explicitly disabled.
-if not _use_dummy and OllamaEmbeddings is not None:
-    try:
-        embeddings = OllamaEmbeddings(model="mxbai-embed-large")
-    except Exception:
-        # Fall back to dummy if Ollama cannot be initialized at runtime.
-        embeddings = DummyEmbeddings()
-else:
-    embeddings = DummyEmbeddings()
+# Prefer embeddings according to MODEL_PROVIDER when available, otherwise fall back.
+def _init_embeddings():
+    # If CI or forced dummy, use dummy
+    if _use_dummy:
+        return DummyEmbeddings()
+
+    # Provider preference: openai -> ollama -> dummy
+    if _MODEL_PROVIDER == "openai" and OpenAIEmbeddings is not None:
+        try:
+            return OpenAIEmbeddings()
+        except Exception:
+            pass
+
+    if _MODEL_PROVIDER == "ollama" and OllamaEmbeddings is not None:
+        try:
+            return OllamaEmbeddings(model="mxbai-embed-large")
+        except Exception:
+            pass
+
+    # Try any available provider
+    if OpenAIEmbeddings is not None:
+        try:
+            return OpenAIEmbeddings()
+        except Exception:
+            pass
+    if OllamaEmbeddings is not None:
+        try:
+            return OllamaEmbeddings(model="mxbai-embed-large")
+        except Exception:
+            pass
+
+    # Last resort
+    return DummyEmbeddings()
+
+embeddings = _init_embeddings()
 
 db_location = "./chroma_langchain_db"
 add_documents = not os.path.exists(db_location)
