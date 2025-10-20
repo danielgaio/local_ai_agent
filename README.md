@@ -86,3 +86,32 @@ fallback for embeddings when running under CI or when the environment variable
 	`USE_DUMMY_EMBEDDINGS=1` in your environment.
 
 This keeps unit tests fast and avoids external service dependency during CI runs.
+
+Model provider configuration
+----------------------------
+This project supports two model providers for LLM and embeddings. Choose which provider to use via the `MODEL_PROVIDER` environment variable.
+
+- MODEL_PROVIDER=ollama (default)
+  - Uses a local Ollama daemon for both LLM and (when available) embeddings.
+  - Make sure Ollama is installed and running, and pull the models used by this project:
+
+```bash
+ollama pull llama3.2:3b
+ollama pull mxbai-embed-large
+```
+
+- MODEL_PROVIDER=openai
+  - Uses OpenAI through LangChain's `OpenAI` and `OpenAIEmbeddings` classes.
+  - Requires an `OPENAI_API_KEY` environment variable. Set it in your shell or in a `.env` file:
+
+```bash
+export OPENAI_API_KEY="sk-..."
+# or add to .env and source it
+```
+
+Fallback and testing helpers
+----------------------------
+- CI/deterministic tests: set `USE_DUMMY_EMBEDDINGS=1` to force a local deterministic embedding implementation. In GitHub Actions this is automatic unless you override it.
+- To force OpenAI usage locally even if Ollama is available: set `MODEL_PROVIDER=openai` and ensure `OPENAI_API_KEY` is set.
+
+See `.env.example` for a template of recommended environment variables.
