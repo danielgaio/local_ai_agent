@@ -1,0 +1,1 @@
+"""Vector store and embeddings management."""
