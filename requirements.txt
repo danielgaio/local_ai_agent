@@ -9,3 +9,4 @@ langchain-openai>=0.0.3
 langchain-ollama>=0.0.3
 langchain-chroma>=0.0.3
 ollama>=0.1.0
+openai>=1.12.0

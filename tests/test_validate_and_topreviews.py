@@ -1,6 +1,6 @@
 import pytest
 
-from main import validate_and_filter
+from src.conversation.validation import validate_and_filter
 
 
 def test_budget_filtering_keeps_only_under_budget():
@@ -32,9 +32,10 @@ def test_attribute_presence_triggers_retry_when_missing():
 
     valid, info = validate_and_filter(parsed, conversation)
     assert valid is False
-    assert isinstance(info, dict)
-    assert info.get("action") == "retry"
-    assert "attribute" in info and info["attribute"] in ("long-travel", "long travel", "travel", "suspension")
+    assert hasattr(info, "action")
+    assert info.action == "retry"
+    assert hasattr(info, "attribute") 
+    assert info.attribute in ("long-travel", "long travel", "travel", "suspension")
 
 
 def test_top_reviews_includes_metadata_fields():
@@ -80,7 +81,7 @@ def test_top_reviews_includes_metadata_fields():
 
 
 def test_keyword_extract_query_basic():
-    from main import keyword_extract_query
+    from src.conversation.history import keyword_extract_query
     q = keyword_extract_query("I want long-travel suspension for adventure touring, budget $12k")
     assert q is not None
     # should include an attribute token and a ride type token

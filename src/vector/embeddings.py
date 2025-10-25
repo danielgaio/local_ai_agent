@@ -7,7 +7,7 @@ from typing import List, Optional
 from langchain_core.embeddings import Embeddings
 from ..core.config import (
     MODEL_PROVIDER, USE_DUMMY, OLLAMA_EMBEDDINGS_MODEL,
-    get_openai_api_key
+    OPENAI_EMBEDDINGS_MODEL, get_openai_api_key
 )
 
 # Optional dependencies
@@ -17,7 +17,7 @@ except ImportError:
     OllamaEmbeddings = None
 
 try:
-    from langchain.embeddings import OpenAIEmbeddings
+    from langchain_openai import OpenAIEmbeddings
 except ImportError:
     OpenAIEmbeddings = None
 
@@ -68,18 +68,15 @@ def init_embeddings() -> Embeddings:
         if OpenAIEmbeddings is not None:
             try:
                 key = get_openai_api_key()
-                return OpenAIEmbeddings(openai_api_key=key)
+                return OpenAIEmbeddings(
+                    model=OPENAI_EMBEDDINGS_MODEL,
+                    openai_api_key=key
+                )
             except Exception as e:
                 # With openai provider, we want to fail if OpenAI embeddings aren't available
-                raise RuntimeError(
-                    f"Failed to initialize OpenAI embeddings "
-                    f"(required when MODEL_PROVIDER=openai): {e}"
-                )
+                raise RuntimeError(f"Failed to initialize OpenAI embeddings (required when MODEL_PROVIDER=openai): {e}")
         else:
-            raise RuntimeError(
-                "OpenAI embeddings not available. Install langchain-openai "
-                "or set MODEL_PROVIDER=ollama."
-            )
+            raise RuntimeError("OpenAI embeddings not available. Install langchain-openai or set MODEL_PROVIDER=ollama.")
 
     # For ollama provider or unspecified, try Ollama first
     if OllamaEmbeddings is not None:

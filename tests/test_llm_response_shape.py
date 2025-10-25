@@ -5,44 +5,18 @@ Test LLM response shape handling
 Verifies that analyze_with_llm correctly handles valid/invalid JSON responses
 """
 
-import sys
-import os
 import json
-
-# Add project root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from src.conversation import analyze_with_llm
+from tests.test_config import setup_test_modules, MockOllama, MockRetriever
 
 def test_llm_response_shape():
     """Test analyze_with_llm behavior with valid/invalid JSON responses"""
+    # Create mock LLM and retriever
+    mock_llm = MockOllama()
+    mock_retriever = MockRetriever()
     
-    # We need to mock the imports and dependencies
-    import types
-    
-    # Mock langchain_ollama.llms module
-    ll_ms = types.SimpleNamespace()
-    class _FakeOllama:
-        def __init__(self, model=None):
-            self.model = model
-        def generate(self, msgs):
-            # return a simple object similar to langchain's output
-            class G:
-                def __init__(self):
-                    from types import SimpleNamespace
-                    self.generations = [[SimpleNamespace(text=mock_llm_response)]]
-            return G()
-
-    ll_ms.OllamaLLM = _FakeOllama
-    sys.modules['langchain_ollama'] = types.SimpleNamespace()
-    sys.modules['langchain_ollama.llms'] = ll_ms
-    
-    # Mock vector module with a dummy retriever
-    class DummyRetriever:
-        def get_relevant_documents(self, q):
-            return []
-    sys.modules['vector'] = types.SimpleNamespace(retriever=DummyRetriever())
-    
-    # Import main module after mocking dependencies
-    import main
+    # Set up test environment with our mock LLM
+    setup_test_modules(mock_llm)
     
     # Test cases with different response types
     test_cases = [
@@ -95,20 +69,11 @@ def test_llm_response_shape():
         print(f"\nTest case {i+1}: {case['name']}")
         print(f"Response: {case['response'][:50]}{'...' if len(case['response']) > 50 else ''}")
         
-        # Set the mock response
-        global mock_llm_response
-        mock_llm_response = case['response']
-        
-        # Mock the invoke function to return our test response
-        def mock_invoke_model_with_prompt(prompt):
-            return case['response']
-        
-        # Replace the function in main module
-        original_invoke = main.invoke_model_with_prompt
-        main.invoke_model_with_prompt = mock_invoke_model_with_prompt
+        # Set the mock response for testing
+        mock_llm.set_mock_response(case['response'])
         
         try:
-            result = main.analyze_with_llm(conversation_history, top_reviews)
+            result = analyze_with_llm(conversation_history, top_reviews)
             
             # Check if JSON parsing worked as expected
             if case['should_parse']:
@@ -154,8 +119,8 @@ def test_llm_response_shape():
             all_passed = False
             
         finally:
-            # Restore original function
-            main.invoke_model_with_prompt = original_invoke
+            # Reset mock response to default
+            mock_llm.set_mock_response("mock response")
     
     if not all_passed:
         raise AssertionError("Some LLM response shape tests failed")

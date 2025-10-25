@@ -13,11 +13,11 @@ from ..conversation.history import (
 from ..conversation.validation import validate_and_filter
 from ..conversation.enrichment import enrich_picks_with_metadata
 from ..vector.store import load_vector_store
-from ..vector.retriever import StandardVectorStoreRetriever
-from ..core.config import DEFAULT_SEARCH_KWARGS, DEBUG
+from ..vector.retriever import EnhancedVectorStoreRetriever
+from ..core.config import DEFAULT_SEARCH_KWARGS, DEBUG, MODEL_PROVIDER
 
 
-def get_docs_from_retriever(retriever: StandardVectorStoreRetriever, query: str) -> List[MotorcycleReview]:
+def get_docs_from_retriever(retriever: EnhancedVectorStoreRetriever, query: str) -> List[MotorcycleReview]:
     """Get relevant reviews from retriever and convert to domain models.
 
     Args:
@@ -247,9 +247,11 @@ def main_cli() -> None:
     """Main CLI entry point."""
     # Initialize vector store and retriever
     vector_store = load_vector_store()
-    retriever = StandardVectorStoreRetriever(
+    retriever = EnhancedVectorStoreRetriever(
         vectorstore=vector_store,
-        search_kwargs=DEFAULT_SEARCH_KWARGS
+        search_kwargs=DEFAULT_SEARCH_KWARGS,
+        provider=MODEL_PROVIDER,
+        batch_size=10  # Will be automatically adjusted based on provider
     )
 
     # Initialize conversation history

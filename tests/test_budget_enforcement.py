@@ -5,32 +5,15 @@ Test budget enforcement functionality
 Verifies that the parse->validate pipeline correctly enforces budget constraints
 """
 
-import sys
-import os
+import re
+from typing import Dict, List
 
-# Add project root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from src.conversation.validation import validate_and_filter
+from tests.test_utils import setup_test_dependencies
 
 def test_budget_enforcement():
     """Test budget enforcement in the validation pipeline"""
-    
-    # We need to mock dependencies to import main
-    import types
-    
-    # Mock langchain_ollama.llms module  
-    ll_ms = types.SimpleNamespace()
-    class _FakeOllama:
-        def __init__(self, model=None):
-            self.model = model
-    ll_ms.OllamaLLM = _FakeOllama
-    sys.modules['langchain_ollama'] = types.SimpleNamespace()
-    sys.modules['langchain_ollama.llms'] = ll_ms
-    
-    # Mock vector module
-    sys.modules['vector'] = types.SimpleNamespace(retriever=None)
-    
-    # Import main module after mocking
-    from main import validate_and_filter
+    setup_test_dependencies()
     
     # Test cases for budget enforcement
     test_cases = [
@@ -143,7 +126,6 @@ def test_budget_enforcement():
             if 'Budget' in ' '.join(case['conversation']):
                 # Extract budget from conversation
                 convo_text = ' '.join(case['conversation'])
-                import re
                 budget = None
                 m = re.search(r"\$\s*([0-9,]+(?:\.\d+)?)", convo_text)
                 if not m:

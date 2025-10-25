@@ -65,12 +65,38 @@ def generate_retriever_query(conversation_history: List[str]) -> Tuple[Optional[
         tuple: (query_string, used_fallback) where used_fallback indicates if
                keyword extraction was used instead of LLM generation
     """
+    from ..llm.providers import get_llm, invoke_model_with_prompt
+    
     # Use the most recent up to 6 messages for context
     recent = conversation_history[-6:]
     convo_block = "\n".join([f"- {m}" for m in recent])
-
+    
+    # Try LLM-generated query first
+    prompt = (
+        "Return a concise search query that captures key details from the conversation "
+        "below. Return only your query (single line, <=12 words) with no extra text.\n\n"
+        f"Conversation:\n{convo_block}\n"
+    )
+    
+    try:
+        raw = invoke_model_with_prompt(get_llm(), prompt)
+        query = raw.strip() if raw else ""
+        
+        # Validate the generated query
+        if query and len(query.split()) <= MAX_QUERY_WORDS:
+            return query, False
+    except:
+        pass
+    
+    # Fall back to deterministic keyword extraction
     query = keyword_extract_query(conversation_history[-1] if conversation_history else "")
     return query, True
+
+
+def generate_retriever_query_str(conversation_history: List[str]) -> Optional[str]:
+    """Compatibility wrapper that returns only the query string (old behavior)."""
+    q, _ = generate_retriever_query(conversation_history)
+    return q
 
 
 def keyword_extract_query(user_message: str) -> Optional[str]:

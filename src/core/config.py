@@ -19,6 +19,8 @@ DATA_FILE = "motorcycle_reviews.csv"
 # Model settings
 OLLAMA_MODEL = "llama3.2:3b"
 OLLAMA_EMBEDDINGS_MODEL = "mxbai-embed-large"
+OPENAI_MODEL = "gpt-3.5-turbo"  # Default model for OpenAI
+OPENAI_EMBEDDINGS_MODEL = "text-embedding-3-small"  # Latest efficient embeddings model
 
 # Default search settings
 DEFAULT_SEARCH_KWARGS = {"k": 5}

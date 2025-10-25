@@ -2,12 +2,12 @@
 
 import os
 import pandas as pd
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
-from ..core.config import DB_LOCATION, DATA_FILE
+from ..core.config import DB_LOCATION, DATA_FILE, MODEL_PROVIDER
 from ..core.models import MotorcycleReview
 from ..utils.parsers import (
     parse_price, parse_engine_cc,
@@ -62,6 +62,43 @@ def build_metadata(text_fields: List[str], row_dict: Dict) -> Dict:
     }
 
 
+def init_vector_store(
+    collection_name: str,
+    embeddings: Any,
+    persist_dir: str,
+    provider: str = MODEL_PROVIDER
+) -> Chroma:
+    """Initialize vector store with provider-specific settings.
+    
+    Args:
+        collection_name: Name of the ChromaDB collection
+        embeddings: Embeddings function to use
+        persist_dir: Directory for persistent storage
+        provider: Model provider (openai or ollama)
+        
+    Returns:
+        Chroma: Configured vector store instance
+    """
+    provider_settings = {
+        "openai": {
+            "distance_metric": "cosine",  # OpenAI embeddings are normalized
+            "normalize_l2": True,         # Ensure L2 normalization
+        },
+        "ollama": {
+            "distance_metric": "l2",      # Default for Ollama
+            "normalize_l2": False,        # Already handled by Ollama
+        }
+    }
+    
+    settings = provider_settings.get(provider, {})
+    
+    return Chroma(
+        collection_name=collection_name,
+        embedding_function=embeddings,
+        persist_directory=persist_dir,
+        **settings
+    )
+
 def load_vector_store() -> Chroma:
     """Initialize or load the vector store with motorcycle reviews.
 
@@ -71,12 +108,13 @@ def load_vector_store() -> Chroma:
     # Initialize embeddings
     embeddings = init_embeddings()
 
-    # Create/load vector store
+    # Create/load vector store with provider-specific settings
     add_documents = not os.path.exists(DB_LOCATION)
-    vector_store = Chroma(
+    vector_store = init_vector_store(
         collection_name="motorcycle_reviews",
-        embedding_function=embeddings,
-        persist_directory=DB_LOCATION
+        embeddings=embeddings,
+        persist_dir=DB_LOCATION,
+        provider=MODEL_PROVIDER
     )
 
     # Add documents if needed

@@ -1,4 +1,4 @@
-from main import is_vague_input
+from src.conversation.history import is_vague_input
 
 
 def test_greeting_hi():
