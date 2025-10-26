@@ -2,6 +2,7 @@
 
 import re
 from typing import Dict, List, Optional, Tuple, Union
+import logging
 
 from ..core.models import (
     ClarifyingQuestion, MotorcyclePick, MotorcycleReview,
@@ -116,6 +117,7 @@ def validate_and_filter(
         return True, parsed
 
     except Exception as e:
+        logging.getLogger(__name__).exception("Unexpected validation error")
         return False, ValidationError(
             reason=f"validation error: {e}",
             action="reject"
@@ -125,22 +127,65 @@ def validate_and_filter(
 def _extract_budget(conversation_history: List[str]) -> Optional[float]:
     """Extract budget value from conversation history."""
     joined = " ".join(conversation_history or [])
-    
-    # Look for patterns like $12,000 or 12000 or 12k
-    m = re.search(r"\$\s*([0-9,]+(?:\.\d+)?)", joined)
-    if not m:
-        m = re.search(r"([0-9,]+(?:\.\d+)?)[\s]*k\b", joined, re.IGNORECASE)
-        if m:
-            try:
-                return float(m.group(1).replace(",", "")) * 1000
-            except (ValueError, TypeError):
-                return None
-    else:
+    text = joined.strip()
+    if not text:
+        return None
+
+    low = text.lower()
+
+    def _to_float(num_str: str, has_k: bool = False) -> Optional[float]:
         try:
-            return float(m.group(1).replace(",", ""))
+            n = float(num_str.replace(",", ""))
+            return n * 1000.0 if has_k else n
         except (ValueError, TypeError):
             return None
-    
+
+    # 1) Explicit dollar amounts like $12,000 or $ 12,000
+    m = re.search(r"\$\s*([0-9,]+(?:\.\d+)?)", low)
+    if m:
+        return _to_float(m.group(1), False)
+
+    # 2) Budget: 12000 USD or 12000 dollars
+    m = re.search(r"budget[:\s]*\$?\s*([0-9,]+(?:\.\d+)?)(k?)\b(?:\s*(?:usd|dollars))?", low)
+    if m:
+        return _to_float(m.group(1), bool(m.group(2)))
+
+    # 3) Comparator patterns like 'under 12k', 'up to 9000', '<= 15k', 'less than 10k', 'at most 9k'
+    m = re.search(
+        r"(?:under|less than|below|up to|upto|at most|max(?:imum)?|<=|<)\s*\$?\s*([0-9,]+(?:\.\d+)?)(k?)\b",
+        low,
+    )
+    if m:
+        return _to_float(m.group(1), bool(m.group(2)))
+
+    # 4) Approximate words like 'around 10k' or 'about 8k'
+    m = re.search(r"(?:around|about|approx(?:\.|imately)?)\s*\$?\s*([0-9,]+(?:\.\d+)?)(k?)\b", low)
+    if m:
+        return _to_float(m.group(1), bool(m.group(2)))
+
+    # 5) Ranges like '12k-15k' or '12k to 15k' -> prefer the upper bound as the budget ceiling
+    m = re.search(r"([0-9,]+(?:\.\d+)?)(k?)\s*(?:-|to|–|and)\s*([0-9,]+(?:\.\d+)?)(k?)\b", low)
+    if m:
+        # use the second group's number and its k-flag if present
+        upper_num = m.group(3)
+        upper_k = bool(m.group(4))
+        return _to_float(upper_num, upper_k)
+
+    # 6) Numbers with unit USD or 'dollars'
+    m = re.search(r"([0-9,]+(?:\.\d+)?)\s*(?:usd|dollars)\b", low)
+    if m:
+        return _to_float(m.group(1), False)
+
+    # 7) Trailing 'k' numbers like '12k' or '12 k'
+    m = re.search(r"([0-9]+(?:\.\d+)?)\s*k\b", low)
+    if m:
+        return _to_float(m.group(1), True)
+
+    # Fallback: look for standalone numbers but only when explicitly prefixed with 'budget' was not found
+    m = re.search(r"budget[:\s]*([0-9,]+(?:\.\d+)?)\b", low)
+    if m:
+        return _to_float(m.group(1), False)
+
     return None
 
 

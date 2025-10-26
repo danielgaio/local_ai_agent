@@ -1,0 +1,75 @@
+CODE-LEVEL ACTIONS, BUGS, AND OPTIMIZATIONS
+=========================================
+
+This file summarizes code-level findings after inspecting the main modules and recommends actionable tasks with file pointers and priority levels. Tasks are written to be small, reviewable, and low-risk where possible.
+
+Executive summary
+-----------------
+- The repository is well-structured and contains reasonable fallbacks for CI (dummy embeddings). Key risks relate to inconsistent entrypoints, broad exception handling that masks errors, mixed dict/pydantic model usage, and logging vs print usage. There are also opportunities for improving robustness (parsing/validation), test coverage, and small performance wins (chunked indexing).
+
+
+
+
+
+
+
+
+
+Performance and maintainability optimizations
+-------------------------------------------
+7) Stream document addition when building Chroma DB (PR size: small)
+   - Files: `src/vector/store.py::load_vector_store`
+   - Why: Current code builds a full list of Document objects in memory before calling `vector_store.add_documents`. For large CSVs this may be memory-heavy. Use a streaming/chunked approach (add in batches) to reduce peak memory.
+
+8) Make embeddings init more deterministic and testable (PR size: small)
+   - Files: `src/vector/embeddings.py`
+   - Why: `init_embeddings` uses environment flags and fallbacks; add clear logging and a single place to override provider for tests. Add a simple factory to inject a `DummyEmbeddings` in tests rather than relying on env var semantics.
+
+API/contract and validation improvements
+---------------------------------------
+9) Move JSON schema and examples into a single canonical place (PR size: small)
+   - Files: `src/llm/prompt_builder.py` (already contains schema) and new `src/llm/schema.json` or pydantic models (already in `src/core/models.py`). Prefer referencing pydantic models in prompts and add unit tests asserting that prompt and pydantic schema remain consistent.
+
+10) Strengthen enrichment matching logic and make it tolerant (PR size: small)
+   - Files: `src/conversation/enrichment.py::enrich_pick`
+   - Issues: Matching logic uses in-string matching which can cause false positives/negatives due to naming variations.
+   - Changes: Normalize tokens more aggressively, strip punctuation, consider fuzzy matching for model names, and prefer exact model identifiers when available.
+
+Testing & CI suggestions (low-effort)
+------------------------------------
+11) Add unit tests for these edge cases:
+    - `_extract_budget` various user strings.
+    - `_extract_prioritized_attribute` detection precision.
+    - `_is_within_budget` handling when pick price is string/None.
+    - `enrich_picks_with_metadata` when there is partial brand/model match.
+    - `invoke_model_with_prompt` behavior when model returns different shapes.
+
+12) Add a deterministic CI smoke test that asserts `USE_DUMMY_EMBEDDINGS=1` produces stable embeddings and that `load_vector_store` can index a tiny subset without Ollama.
+
+Code quality and developer experience
+------------------------------------
+13) Add `pre-commit` hooks and configure `ruff` + `black` (PR size: small)
+    - Files: add `.pre-commit-config.yaml`, `pyproject.toml` or `setup.cfg` for config.
+
+14) Pin dependencies or add `constraints.txt` (PR size: small)
+    - Files: `requirements.txt` -> add pinned `==` versions or add `requirements-lock.txt`.
+
+Low-priority / long-term suggestions
+-----------------------------------
+- Consider converting the CLI to use `argparse`/`typer` so it can be non-interactive for tests and easier to script.
+- Add typed stubs and run `mypy` as optional CI to increase confidence in refactors.
+- Add caching for frequent operations (e.g., parsed budget per conversation) if workload grows.
+
+Quick grep notes I used (helpful locations)
+----------------------------------------
+- Prints found in: `src/cli/main.py` (many user-facing prints and error prints)
+- Broad excepts found in: `src/llm/providers.py`, `src/conversation/enrichment.py`, `src/conversation/validation.py`, `src/conversation/history.py`
+- Env/config entrypoints: `src/core/config.py` (MODEL_PROVIDER, USE_DUMMY, flags)
+
+Next recommended step (I can implement)
+-------------------------------------
+Start with the compatibility shim (`main.py`) and then a small logging/exception hygiene PR for `src/cli/main.py`. These are small, low-risk, fix common test issues, and will make subsequent changes easier to test.
+
+If you want, I will implement the shim now and run the test suite. Tell me to proceed and I'll: add the file, run pytest, and report results.
+
+End of file.

@@ -143,6 +143,8 @@ def enrich_picks_with_metadata(
 
         return parsed
 
-    except Exception:
-        # If enrichment fails, return original
+    except Exception as e:
+        # If enrichment fails, log the error and return original
+        import logging
+        logging.getLogger(__name__).exception("enrich_picks_with_metadata failed: %s", e)
         return parsed

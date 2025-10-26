@@ -2,10 +2,12 @@
 
 import json
 import sys
+import logging
 from typing import List, Optional
 
 from ..core.models import MotorcycleReview
 from ..llm.providers import get_llm, invoke_model_with_prompt
+from ..llm.response_parser import parse_llm_response
 from ..llm.prompt_builder import build_llm_prompt
 from ..conversation.history import (
     is_vague_input, generate_retriever_query, keyword_extract_query
@@ -104,7 +106,8 @@ def generate_clarifying_question(conversation_history: List[str]) -> Optional[st
                 ln = ln.rstrip('.') + "?"
             return ln
 
-    except Exception:
+    except Exception as e:
+        logging.getLogger(__name__).debug("Clarifying question generation failed", exc_info=e)
         return None
 
 
@@ -136,8 +139,9 @@ def analyze_with_llm(
     response = _sanitize_raw(response)
 
     try:
-        parsed = json.loads(response.strip())
+        parsed = parse_llm_response(response)
     except json.JSONDecodeError:
+        # If model returned non-JSON, return raw response for debugging (preserve old behavior)
         return response
 
     # Validate and allow one retry
@@ -157,7 +161,7 @@ def analyze_with_llm(
         retry_resp = retry_resp and retry_resp.strip()
 
         try:
-            parsed_retry = json.loads(retry_resp)
+            parsed_retry = parse_llm_response(retry_resp)
             valid2, info2 = validate_and_filter(parsed_retry, conversation_history)
             if valid2:
                 parsed = parsed_retry
@@ -173,7 +177,7 @@ def analyze_with_llm(
     try:
         parsed = enrich_picks_with_metadata(parsed, top_reviews)
     except Exception:
-        pass
+        logging.getLogger(__name__).exception("enrich_picks_with_metadata failed")
 
     # Format response for display
     try:
@@ -240,6 +244,7 @@ def analyze_with_llm(
         else:
             return response
     except Exception:
+        logging.getLogger(__name__).exception("formatting LLM response failed")
         return response
 
 

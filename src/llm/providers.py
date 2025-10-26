@@ -2,12 +2,15 @@
 
 import inspect
 import os
+import logging
 from typing import Any, Dict, List, Optional, Union
 
 from ..core.config import (
     MODEL_PROVIDER, OLLAMA_MODEL, OPENAI_MODEL,
     get_openai_api_key
 )
+
+logger = logging.getLogger(__name__)
 
 # Optional dependencies - lazy import based on provider
 OllamaLLM = None
@@ -110,8 +113,16 @@ def invoke_model_with_prompt(model: Any, prompt_text: str) -> str:
         # Handle mock LLM first
         if _is_mock_ollama(model):
             # Mock LLM will handle prompt appropriately
-            return model.invoke(prompt_text)
-            
+            try:
+                return model.invoke(prompt_text)
+            except Exception:
+                # Some mock interfaces expose different helpers
+                try:
+                    return model.generate(prompt_text)
+                except Exception:
+                    logger.exception("Mock LLM invocation failed")
+                    raise
+
         messages = [{"role": "user", "content": prompt_text}]
 
         # Try a set of common chat-style method names
@@ -120,40 +131,57 @@ def invoke_model_with_prompt(model: Any, prompt_text: str) -> str:
         for meth in chat_methods:
             if hasattr(model, meth):
                 func = getattr(model, meth)
+                out = None
                 try:
                     # try calling with a messages arg or positional
                     try:
                         out = func(messages=messages)
                     except TypeError:
                         out = func(messages)
-                except Exception:
+                except TypeError:
                     # try a single-arg call
-                    out = func(messages)
+                    try:
+                        out = func(messages)
+                    except Exception:
+                        logger.exception("LLM method %s call failed with TypeError", meth)
+                        continue
+                except Exception:
+                    logger.exception("LLM method %s call failed", meth)
+                    continue
 
                 # common extraction patterns
-                if hasattr(out, "generations"):
-                    try:
-                        return out.generations[0][0].text
-                    except Exception:
-                        return str(out)
-                if isinstance(out, str):
-                    return out
-                if isinstance(out, dict):
-                    # try common keys
-                    for k in ("text", "content", "message"):
-                        if k in out:
-                            v = out[k]
-                            if isinstance(v, dict) and "content" in v:
-                                return v["content"]
-                            return v
-                if hasattr(out, "text"):
-                    return out.text
-                if hasattr(out, "content"):
-                    return out.content
-                return str(out)
+                try:
+                    if hasattr(out, "generations"):
+                        try:
+                            return out.generations[0][0].text
+                        except Exception:
+                            return str(out)
+                    if isinstance(out, str):
+                        return out
+                    if isinstance(out, dict):
+                        # try common keys
+                        for k in ("text", "content", "message"):
+                            if k in out:
+                                v = out[k]
+                                if isinstance(v, dict) and "content" in v:
+                                    return v["content"]
+                                return v
+                    if hasattr(out, "text"):
+                        return out.text
+                    if hasattr(out, "content"):
+                        return out.content
+                    return str(out)
+                except Exception:
+                    logger.exception("Failed to extract text from LLM output")
+                    return str(out)
 
         # Fallback: keep using generate for older/langchain-llm implementations
-        out = model.generate([prompt_text])
+        try:
+            out = model.generate([prompt_text])
+        except TypeError:
+            # Some older generate APIs expect a single string
+            out = model.generate(prompt_text)
+
         if hasattr(out, "generations"):
             try:
                 return out.generations[0][0].text
@@ -162,4 +190,5 @@ def invoke_model_with_prompt(model: Any, prompt_text: str) -> str:
         return str(out)
 
     except Exception as e:
+        logger.exception("Error invoking model")
         return f"Error invoking model: {e}\n\nFormatted prompt:\n{prompt_text}"

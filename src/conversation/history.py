@@ -1,8 +1,12 @@
 """Conversation history management."""
 
+import logging
 import re
 from typing import List, Optional, Tuple
 from ..core.config import MAX_QUERY_WORDS
+
+# module logger
+logger = logging.getLogger(__name__)
 
 
 def is_vague_input(text: str) -> bool:
@@ -81,15 +85,32 @@ def generate_retriever_query(conversation_history: List[str]) -> Tuple[Optional[
     try:
         raw = invoke_model_with_prompt(get_llm(), prompt)
         query = raw.strip() if raw else ""
-        
-        # Validate the generated query
-        if query and len(query.split()) <= MAX_QUERY_WORDS:
+
+        # Log empty or invalid outputs from the LLM so we can debug fallbacks
+        if not query:
+            logger.debug("LLM returned empty query output, falling back to deterministic extractor")
+        elif len(query.split()) > MAX_QUERY_WORDS:
+            logger.debug(
+                "LLM returned query with %d words (max %d); falling back: %s",
+                len(query.split()), MAX_QUERY_WORDS, query[:200]
+            )
+        else:
+            # Valid query from LLM
             return query, False
-    except:
-        pass
+    except Exception as e:
+        # Log why LLM-generated query failed and fall back to deterministic extraction
+        logger.exception("LLM query generation failed")
     
     # Fall back to deterministic keyword extraction
-    query = keyword_extract_query(conversation_history[-1] if conversation_history else "")
+    # Fall back to deterministic keyword extraction. This may still return None
+    # if the user's last message contains no extractable tokens.
+    fallback_input = conversation_history[-1] if conversation_history else ""
+    query = keyword_extract_query(fallback_input)
+    if query is None:
+        logger.debug(
+            "Deterministic keyword extractor produced no tokens for input: %r. Returning (None, True)",
+            fallback_input
+        )
     return query, True
 
 
