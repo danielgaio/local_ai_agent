@@ -68,5 +68,12 @@ def setup_test_dependencies() -> None:
             return self.retriever
     
     sys.modules['src.vector.store'] = types.SimpleNamespace(
-        init_vector_store=lambda *args, **kwargs: FakeVectorStore()
+        init_vector_store=lambda *args, **kwargs: FakeVectorStore(),
+        # Add attributes that other tests may need to patch
+        DATA_FILE='mock_data.csv',
+        DB_LOCATION='./mock_db',
+        MODEL_PROVIDER='ollama',
+        os=__import__('os'),
+        init_embeddings=lambda: None,
+        load_vector_store=lambda *args, **kwargs: FakeVectorStore()
     )
