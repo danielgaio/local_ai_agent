@@ -6,17 +6,7 @@ This file summarizes code-level findings after inspecting the main modules and r
 
 - The repository is well-structured and contains reasonable fallbacks for CI (dummy embeddings). Key risks relate to inconsistent entrypoints, broad exception handling that masks errors, mixed dict/pydantic model usage, and logging vs print usage. There are also opportunities for improving robustness (parsing/validation), test coverage, and small performance wins (chunked indexing).
 
-## Performance and maintainability optimizations
-
-8. Make embeddings init more deterministic and testable (PR size: small)
-   - Files: `src/vector/embeddings.py`
-   - Why: `init_embeddings` uses environment flags and fallbacks; add clear logging and a single place to override provider for tests. Add a simple factory to inject a `DummyEmbeddings` in tests rather than relying on env var semantics.
-
 ## API/contract and validation improvements
-
-9. Move JSON schema and examples into a single canonical place (PR size: small)
-
-   - Files: `src/llm/prompt_builder.py` (already contains schema) and new `src/llm/schema.json` or pydantic models (already in `src/core/models.py`). Prefer referencing pydantic models in prompts and add unit tests asserting that prompt and pydantic schema remain consistent.
 
 10. Strengthen enrichment matching logic and make it tolerant (PR size: small)
 
