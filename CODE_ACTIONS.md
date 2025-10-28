@@ -6,14 +6,6 @@ This file summarizes code-level findings after inspecting the main modules and r
 
 - The repository is well-structured and contains reasonable fallbacks for CI (dummy embeddings). Key risks relate to inconsistent entrypoints, broad exception handling that masks errors, mixed dict/pydantic model usage, and logging vs print usage. There are also opportunities for improving robustness (parsing/validation), test coverage, and small performance wins (chunked indexing).
 
-## API/contract and validation improvements
-
-10. Strengthen enrichment matching logic and make it tolerant (PR size: small)
-
-- Files: `src/conversation/enrichment.py::enrich_pick`
-- Issues: Matching logic uses in-string matching which can cause false positives/negatives due to naming variations.
-- Changes: Normalize tokens more aggressively, strip punctuation, consider fuzzy matching for model names, and prefer exact model identifiers when available.
-
 ## Testing & CI suggestions (low-effort)
 
 11. Add unit tests for these edge cases:
