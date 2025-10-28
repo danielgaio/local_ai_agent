@@ -8,14 +8,6 @@ This file summarizes code-level findings after inspecting the main modules and r
 
 ## Testing & CI suggestions (low-effort)
 
-11. Add unit tests for these edge cases:
-
-    - `_extract_budget` various user strings.
-    - `_extract_prioritized_attribute` detection precision.
-    - `_is_within_budget` handling when pick price is string/None.
-    - `enrich_picks_with_metadata` when there is partial brand/model match.
-    - `invoke_model_with_prompt` behavior when model returns different shapes.
-
 12. Add a deterministic CI smoke test that asserts `USE_DUMMY_EMBEDDINGS=1` produces stable embeddings and that `load_vector_store` can index a tiny subset without Ollama.
 
 ## Code quality and developer experience
