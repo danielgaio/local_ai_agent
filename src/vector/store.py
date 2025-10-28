@@ -79,29 +79,24 @@ def init_vector_store(
         collection_name: Name of the ChromaDB collection
         embeddings: Embeddings function to use
         persist_dir: Directory for persistent storage
-        provider: Model provider (openai or ollama)
+        provider: Model provider (openai or ollama) - currently unused but kept for future extension
         
     Returns:
         Chroma: Configured vector store instance
+        
+    Note:
+        ChromaDB handles distance metrics automatically based on embeddings.
+        Provider-specific settings are noted here for documentation but not actively used.
     """
-    provider_settings = {
-        "openai": {
-            "distance_metric": "cosine",  # OpenAI embeddings are normalized
-            "normalize_l2": True,         # Ensure L2 normalization
-        },
-        "ollama": {
-            "distance_metric": "l2",      # Default for Ollama
-            "normalize_l2": False,        # Already handled by Ollama
-        }
-    }
-    
-    settings = provider_settings.get(provider, {})
+    # Note: Chroma handles distance metrics internally based on the embeddings
+    # OpenAI embeddings use cosine similarity (normalized vectors)
+    # Ollama embeddings use L2 distance
+    # No explicit configuration needed in current Chroma API
     
     return Chroma(
         collection_name=collection_name,
         embedding_function=embeddings,
-        persist_directory=persist_dir,
-        **settings
+        persist_directory=persist_dir
     )
 
 def load_vector_store(chunk_size: int = 100) -> Chroma:

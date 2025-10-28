@@ -6,10 +6,6 @@ This file summarizes code-level findings after inspecting the main modules and r
 
 - The repository is well-structured and contains reasonable fallbacks for CI (dummy embeddings). Key risks relate to inconsistent entrypoints, broad exception handling that masks errors, mixed dict/pydantic model usage, and logging vs print usage. There are also opportunities for improving robustness (parsing/validation), test coverage, and small performance wins (chunked indexing).
 
-## Testing & CI suggestions (low-effort)
-
-12. Add a deterministic CI smoke test that asserts `USE_DUMMY_EMBEDDINGS=1` produces stable embeddings and that `load_vector_store` can index a tiny subset without Ollama.
-
 ## Code quality and developer experience
 
 13. Add `pre-commit` hooks and configure `ruff` + `black` (PR size: small)
