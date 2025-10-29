@@ -1,0 +1,14 @@
+# Development dependencies
+# Install with: pip install -r requirements.txt -r requirements-dev.txt
+
+# Code quality and formatting
+pre-commit==4.3.0
+ruff==0.14.2
+black==25.9.0
+
+# Security scanning
+bandit==1.8.6
+
+# Type checking (optional)
+# mypy==1.8.0
+# types-requests==2.31.0

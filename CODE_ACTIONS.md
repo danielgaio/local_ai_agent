@@ -6,15 +6,6 @@ This file summarizes code-level findings after inspecting the main modules and r
 
 - The repository is well-structured and contains reasonable fallbacks for CI (dummy embeddings). Key risks relate to inconsistent entrypoints, broad exception handling that masks errors, mixed dict/pydantic model usage, and logging vs print usage. There are also opportunities for improving robustness (parsing/validation), test coverage, and small performance wins (chunked indexing).
 
-## Code quality and developer experience
-
-13. Add `pre-commit` hooks and configure `ruff` + `black` (PR size: small)
-
-    - Files: add `.pre-commit-config.yaml`, `pyproject.toml` or `setup.cfg` for config.
-
-14. Pin dependencies or add `constraints.txt` (PR size: small)
-    - Files: `requirements.txt` -> add pinned `==` versions or add `requirements-lock.txt`.
-
 ## Low-priority / long-term suggestions
 
 - Consider converting the CLI to use `argparse`/`typer` so it can be non-interactive for tests and easier to script.
