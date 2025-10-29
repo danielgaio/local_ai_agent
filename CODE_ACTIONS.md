@@ -8,7 +8,6 @@ This file summarizes code-level findings after inspecting the main modules and r
 
 ## Low-priority / long-term suggestions
 
-- Consider converting the CLI to use `argparse`/`typer` so it can be non-interactive for tests and easier to script.
 - Add typed stubs and run `mypy` as optional CI to increase confidence in refactors.
 - Add caching for frequent operations (e.g., parsed budget per conversation) if workload grows.
 
@@ -17,11 +16,3 @@ This file summarizes code-level findings after inspecting the main modules and r
 - Prints found in: `src/cli/main.py` (many user-facing prints and error prints)
 - Broad excepts found in: `src/llm/providers.py`, `src/conversation/enrichment.py`, `src/conversation/validation.py`, `src/conversation/history.py`
 - Env/config entrypoints: `src/core/config.py` (MODEL_PROVIDER, USE_DUMMY, flags)
-
-## Next recommended step (I can implement)
-
-Start with the compatibility shim (`main.py`) and then a small logging/exception hygiene PR for `src/cli/main.py`. These are small, low-risk, fix common test issues, and will make subsequent changes easier to test.
-
-If you want, I will implement the shim now and run the test suite. Tell me to proceed and I'll: add the file, run pytest, and report results.
-
-End of file.

@@ -47,7 +47,37 @@ This will call `vector.py` which reads `motorcycle_reviews.csv`, extracts lightw
 
 Running the recommender
 -----------------------
-Run:
+### Interactive Mode (Recommended)
+Run the new Typer-based CLI:
+
+```bash
+python run_typer.py
+```
+
+This starts an interactive conversation where you can refine your preferences across multiple messages.
+
+### Non-Interactive Mode (New!)
+For scripting, testing, or automation:
+
+```bash
+# Single query
+python run_typer.py --query "adventure bike under 10000"
+
+# JSON output
+python run_typer.py --query "adventure bike" --json
+
+# Batch processing
+python run_typer.py --batch queries.txt --output results.json
+```
+
+See [`CLI_USAGE.md`](CLI_USAGE.md) for complete documentation and examples.
+
+### Legacy CLI
+The original interactive-only CLI is still available:
+
+```bash
+python run.py
+```
 
 ```bash
 python main.py
