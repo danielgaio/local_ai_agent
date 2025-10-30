@@ -192,6 +192,38 @@ pytest tests/test_cli_typer.py --cov=src.cli.typer_main
 - `AIAGENT_DEBUG`: `1` for debug logging
 - `OPENAI_API_KEY`: Required when using OpenAI provider
 
+### Using OpenAI Provider
+
+To use OpenAI instead of local Ollama:
+
+```bash
+# Set environment variables
+export MODEL_PROVIDER=openai
+export OPENAI_API_KEY="sk-..."
+
+# Run normally
+python run_typer.py --query "adventure bike"
+
+# Or inline
+MODEL_PROVIDER=openai OPENAI_API_KEY="sk-..." python run_typer.py -q "touring bike"
+```
+
+OpenAI configuration:
+- **LLM Model**: `gpt-3.5-turbo` (configurable in `src/core/config.py`)
+- **Embeddings Model**: `text-embedding-3-small` (latest efficient model)
+- **Advantages**: No local setup, faster cold start, consistent performance
+- **Disadvantages**: Requires API key, costs per token, internet dependency
+
+To test OpenAI integration (requires API key):
+```bash
+# Set environment variables
+export MODEL_PROVIDER=openai
+export OPENAI_API_KEY="sk-..."
+
+# Run integration tests
+pytest tests/test_openai_integration.py -v
+```
+
 ## Error Handling
 
 Non-interactive mode provides structured error responses:

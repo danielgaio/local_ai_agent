@@ -93,6 +93,25 @@ Run the test suite with:
 python -m pytest -q
 ```
 
+### OpenAI Integration Tests
+
+The project includes integration tests for the OpenAI provider. These tests are automatically skipped unless you have an OpenAI API key configured:
+
+```bash
+# Set your OpenAI API key
+export OPENAI_API_KEY="sk-..."
+export MODEL_PROVIDER=openai
+
+# Run OpenAI integration tests
+pytest tests/test_openai_integration.py -v
+```
+
+The integration tests verify:
+- OpenAI LLM initialization and invocation
+- OpenAI embeddings functionality
+- Vector store with OpenAI embeddings
+- End-to-end query flow with OpenAI provider
+
 Notes
 -----
 - If you run into issues with `chromadb` or `langchain-chroma`, check package compatibility in `requirements.txt` and update accordingly.
@@ -121,7 +140,7 @@ Model provider configuration
 ----------------------------
 This project supports two model providers for LLM and embeddings. Choose which provider to use via the `MODEL_PROVIDER` environment variable.
 
-- MODEL_PROVIDER=ollama (default)
+- **MODEL_PROVIDER=ollama** (default)
   - Uses a local Ollama daemon for both LLM and (when available) embeddings.
   - Make sure Ollama is installed and running, and pull the models used by this project:
 
@@ -130,14 +149,17 @@ ollama pull llama3.2:3b
 ollama pull mxbai-embed-large
 ```
 
-- MODEL_PROVIDER=openai
-  - Uses OpenAI through LangChain's `OpenAI` and `OpenAIEmbeddings` classes.
+- **MODEL_PROVIDER=openai**
+  - Uses OpenAI through LangChain's `ChatOpenAI` and `OpenAIEmbeddings` classes.
   - Requires an `OPENAI_API_KEY` environment variable. Set it in your shell or in a `.env` file:
 
 ```bash
 export OPENAI_API_KEY="sk-..."
+export MODEL_PROVIDER=openai
 # or add to .env and source it
 ```
+
+For detailed OpenAI setup instructions, see [**OPENAI_SETUP.md**](OPENAI_SETUP.md).
 
 Fallback and testing helpers
 ----------------------------
